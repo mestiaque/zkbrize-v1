@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Permissions — ZK Bridge</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f0f2f5; color: #1a1a2e; min-height: 100vh; }
+  .topbar { background: #1a1a2e; color: #fff; padding: 0 24px; height: 56px; display: flex; align-items: center; justify-content: space-between; }
+  .topbar-brand { font-weight: 700; font-size: 16px; display: flex; align-items: center; gap: 10px; }
+  .brand-icon { width: 32px; height: 32px; background: linear-gradient(135deg,#6c63ff,#48cae4); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 13px; }
+  .topbar-actions { display: flex; gap: 10px; align-items: center; }
+  a.back-link { color: #aaa; text-decoration: none; font-size: 13px; }
+  a.back-link:hover { color: #fff; }
+  .container { max-width: 860px; margin: 32px auto; padding: 0 20px 60px; }
+  h1 { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+  .sub { color: #666; font-size: 13px; margin-bottom: 28px; }
+  .section { background: #fff; border-radius: 12px; border: 1px solid #e5e7eb; margin-bottom: 20px; overflow: hidden; }
+  .section-head { padding: 16px 20px; border-bottom: 1px solid #f0f2f5; display: flex; align-items: center; gap: 10px; }
+  .section-icon { width: 34px; height: 34px; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+  .icon-blue { background: #eff6ff; color: #3b82f6; }
+  .icon-green { background: #f0fdf4; color: #22c55e; }
+  .icon-purple { background: #faf5ff; color: #a855f7; }
+  .icon-amber { background: #fffbeb; color: #f59e0b; }
+  .icon-red { background: #fef2f2; color: #ef4444; }
+  .section-title { font-weight: 600; font-size: 14px; }
+  .section-desc { font-size: 12px; color: #888; }
+  .perm-list { padding: 8px 0; }
+  .perm-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; border-bottom: 1px solid #f9fafb; }
+  .perm-row:last-child { border-bottom: none; }
+  .perm-info { flex: 1; }
+  .perm-label { font-size: 13px; font-weight: 500; color: #1a1a2e; }
+  .perm-hint { font-size: 11px; color: #999; margin-top: 2px; }
+  .toggle { position: relative; width: 44px; height: 24px; flex-shrink: 0; }
+  .toggle input { opacity: 0; width: 0; height: 0; }
+  .slider { position: absolute; cursor: pointer; inset: 0; background: #d1d5db; border-radius: 24px; transition: .2s; }
+  .slider:before { content:''; position: absolute; width: 18px; height: 18px; left: 3px; bottom: 3px; background: #fff; border-radius: 50%; transition: .2s; }
+  input:checked + .slider { background: #6c63ff; }
+  input:checked + .slider:before { transform: translateX(20px); }
+  .footer { padding: 16px 20px; background: #f9fafb; border-top: 1px solid #e5e7eb; display: flex; justify-content: flex-end; gap: 10px; }
+  .btn { padding: 9px 20px; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid #e5e7eb; background: #fff; color: #333; }
+  .btn:hover { background: #f5f5f5; }
+  .btn-primary { background: #6c63ff; color: #fff; border-color: #6c63ff; }
+  .btn-primary:hover { background: #5a52d5; }
+  .toast { position: fixed; bottom: 24px; right: 24px; padding: 12px 20px; border-radius: 10px; font-size: 13px; font-weight: 500; color: #fff; background: #22c55e; box-shadow: 0 4px 16px rgba(0,0,0,.15); opacity: 0; transition: opacity .3s; pointer-events: none; z-index: 999; }
+  .toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-brand">
+    <div class="brand-icon">ZK</div>
+    ZK Bridge — Permissions
+  </div>
+  <div class="topbar-actions">
+    <a class="back-link" href="/">← Back to App</a>
+  </div>
+</div>
+
+<div class="container">
+  <h1>Permission Settings</h1>
+  <p class="sub">Control which features, buttons, and cards are visible in the main app. Changes take effect immediately on next page load.</p>
+
+  <!-- Navigation -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-icon icon-blue">
+        <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+      </div>
+      <div>
+        <div class="section-title">Navigation Menu</div>
+        <div class="section-desc">Show or hide sidebar menu items</div>
+      </div>
+    </div>
+    <div class="perm-list" id="section-nav"></div>
+  </div>
+
+  <!-- Employees -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-icon icon-purple">
+        <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+      </div>
+      <div>
+        <div class="section-title">Employees Page</div>
+        <div class="section-desc">Buttons and cards on the Employees page</div>
+      </div>
+    </div>
+    <div class="perm-list" id="section-employees"></div>
+  </div>
+
+  <!-- Devices -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-icon icon-green">
+        <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2z"/></svg>
+      </div>
+      <div>
+        <div class="section-title">Devices Page</div>
+        <div class="section-desc">Cards and tools on the Devices page</div>
+      </div>
+    </div>
+    <div class="perm-list" id="section-devices"></div>
+  </div>
+
+  <!-- Attendance -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-icon icon-amber">
+        <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2z"/></svg>
+      </div>
+      <div>
+        <div class="section-title">Attendance Page</div>
+        <div class="section-desc">Action buttons on the Attendance page</div>
+      </div>
+    </div>
+    <div class="perm-list" id="section-attendance"></div>
+  </div>
+
+  <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:8px">
+    <button class="btn" onclick="resetDefaults()">Reset to Defaults</button>
+    <button class="btn btn-primary" onclick="savePermissions()">Save Permissions</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SCHEMA = {
+  nav: {
+    label: 'Navigation Menu',
+    items: {
+      dashboard:  { label: 'Dashboard',  hint: 'Overview stats and activity' },
+      devices:    { label: 'Devices',    hint: 'Device management page' },
+      employees:  { label: 'Employees',  hint: 'Employee management page' },
+      attendance: { label: 'Attendance', hint: 'Attendance records page' },
+      logs:       { label: 'Logs',       hint: 'System logs page' },
+      settings:   { label: 'Settings',   hint: 'Configuration page' },
+      guide:      { label: 'User Guide', hint: 'Help and documentation' },
+    }
+  },
+  employees: {
+    label: 'Employees Page',
+    items: {
+      btn_load_laravel:  { label: 'Button: Load from Laravel', hint: 'Fetch employees from Laravel API and save to bridge' },
+      btn_load_machine:  { label: 'Button: Load from Machine', hint: 'Load employees from TCP-enabled ZKTeco device' },
+      btn_set_device:    { label: 'Button: Set to Device',     hint: 'Push employees to connected TCP device' },
+      btn_add_employee:  { label: 'Button: Add Employee',      hint: 'Manually create a new employee' },
+      export_csv:        { label: 'Export CSV button',         hint: 'Download employee list as CSV for ZKBio Security' },
+      export_dat:        { label: 'Export DAT (USB) button',   hint: 'Download user.dat for ZKTeco USB import' },
+      card_export_guide: { label: 'Card: Export Guide',        hint: 'Instructions for CSV/DAT export' },
+      card_api_docs:     { label: 'Card: Laravel API Docs',    hint: 'Code snippet for Laravel endpoint setup' },
+    }
+  },
+  devices: {
+    label: 'Devices Page',
+    items: {
+      card_add_tcp:    { label: 'Card: Add TCP/IP Device', hint: 'Form to connect older ZKTeco TCP devices' },
+      card_adms_info:  { label: 'Card: ADMS Push Server',  hint: 'ADMS server address info for cloud devices' },
+      card_ping_test:  { label: 'Card: Ping Test',         hint: 'Network reachability test tool' },
+    }
+  },
+  attendance: {
+    label: 'Attendance Page',
+    items: {
+      btn_fetch:        { label: 'Button: Fetch from Devices', hint: 'Pull attendance from TCP devices' },
+      btn_push_laravel: { label: 'Button: Push to Laravel',    hint: 'Send attendance records to Laravel API' },
+    }
+  },
+};
+
+let permissions = {};
+
+async function load() {
+  const res = await fetch('/api/permissions');
+  const data = await res.json();
+  permissions = data.permissions;
+  render();
+}
+
+function render() {
+  for (const [section, schema] of Object.entries(SCHEMA)) {
+    const el = document.getElementById('section-' + section);
+    if (!el) continue;
+    el.innerHTML = '';
+    for (const [key, meta] of Object.entries(schema.items)) {
+      const checked = permissions[section]?.[key] !== false;
+      el.innerHTML += `
+        <div class="perm-row">
+          <div class="perm-info">
+            <div class="perm-label">${meta.label}</div>
+            <div class="perm-hint">${meta.hint}</div>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" data-section="${section}" data-key="${key}" ${checked ? 'checked' : ''} onchange="toggle(this)">
+            <span class="slider"></span>
+          </label>
+        </div>`;
+    }
+  }
+}
+
+function toggle(el) {
+  const { section, key } = el.dataset;
+  if (!permissions[section]) permissions[section] = {};
+  permissions[section][key] = el.checked;
+}
+
+async function savePermissions() {
+  const res = await fetch('/api/permissions', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(permissions),
+  });
+  const data = await res.json();
+  if (data.success) showToast('Permissions saved!');
+  else showToast('Save failed: ' + data.error, true);
+}
+
+async function resetDefaults() {
+  const res = await fetch('/api/permissions');
+  const data = await res.json();
+  permissions = JSON.parse(JSON.stringify(data.defaults));
+  render();
+  showToast('Reset to defaults. Click Save to apply.');
+}
+
+function showToast(msg, error = false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.background = error ? '#ef4444' : '#22c55e';
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+load();
+</script>
+</body>
+</html>

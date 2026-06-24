@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZK Bridge — User Management</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f0f2f8; color: #1a1a2e; }
+.topbar { background:#fff;border-bottom:1px solid #e8eaf0;padding:0 28px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10; }
+.topbar-left { display:flex;align-items:center;gap:12px; }
+.logo-icon { width:34px;height:34px;background:#6c63ff;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px; }
+.topbar-title { font-size:15px;font-weight:600; }
+.topbar-right { display:flex;align-items:center;gap:10px; }
+.btn { padding:8px 16px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;border:none; }
+.btn-primary { background:#6c63ff;color:#fff; }
+.btn-primary:hover { background:#5a52e0; }
+.btn-ghost { background:transparent;color:#555;border:1.5px solid #e0e3ea; }
+.btn-ghost:hover { background:#f5f5f5; }
+.btn-danger { background:#fff1f0;color:#cf1322;border:1px solid #ffa39e; }
+.btn-danger:hover { background:#ffd7d5; }
+.btn-sm { padding:5px 12px;font-size:12px; }
+main { max-width:960px;margin:32px auto;padding:0 20px; }
+h1 { font-size:22px;font-weight:700;margin-bottom:4px; }
+.sub { font-size:13px;color:#888;margin-bottom:24px; }
+.card { background:#fff;border-radius:12px;box-shadow:0 1px 6px rgba(0,0,0,.07);overflow:hidden;margin-bottom:20px; }
+.card-header { padding:16px 20px;border-bottom:1px solid #f0f2f5;display:flex;align-items:center;justify-content:space-between; }
+.card-title { font-size:14px;font-weight:600; }
+table { width:100%;border-collapse:collapse; }
+th { text-align:left;padding:10px 20px;font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.5px;background:#fafbfc;border-bottom:1px solid #f0f2f5; }
+td { padding:13px 20px;font-size:13px;border-bottom:1px solid #f7f8fa;vertical-align:middle; }
+tr:last-child td { border-bottom:none; }
+.badge { display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:600; }
+.badge-superadmin,.badge-super { background:#f0edff;color:#6c63ff; }
+.badge-admin { background:#e6f4ff;color:#1677ff; }
+.badge-viewer { background:#f6ffed;color:#389e0d; }
+.badge-custom { background:#fff7e6;color:#d46b08; }
+.tag-master { background:#fff7e6;color:#d46b08;font-size:11px;padding:2px 8px;border-radius:20px;font-weight:600; }
+.tag-locked { background:#f5f5f5;color:#aaa;font-size:10px;padding:1px 7px;border-radius:20px; }
+.actions { display:flex;gap:6px;flex-wrap:wrap; }
+/* Overlay / modal */
+.overlay { display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:100;align-items:flex-start;justify-content:center;overflow-y:auto;padding:40px 16px; }
+.overlay.show { display:flex; }
+.modal { background:#fff;border-radius:12px;padding:28px;width:560px;max-width:98vw;margin:auto; }
+.modal h3 { font-size:16px;font-weight:600;margin-bottom:20px; }
+.form-group { margin-bottom:14px; }
+.form-group > label { display:block;font-size:12px;font-weight:500;color:#555;margin-bottom:6px; }
+.form-group input, .form-group select { width:100%;padding:9px 12px;border:1.5px solid #e0e3ea;border-radius:8px;font-size:13px;outline:none; }
+.form-group input:focus, .form-group select:focus { border-color:#6c63ff; }
+/* Permission sections in modal */
+.perm-section { border:1px solid #e8eaf0;border-radius:10px;margin-bottom:12px;overflow:hidden; }
+.perm-section-head { background:#f7f8fc;padding:10px 14px;display:flex;align-items:center;justify-content:space-between; }
+.perm-section-title { font-size:12px;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:.4px; }
+.perm-section-toggle { font-size:11px;color:#6c63ff;cursor:pointer;text-decoration:underline; }
+.perm-rows { padding:4px 0; }
+.perm-row { display:flex;align-items:center;justify-content:space-between;padding:8px 14px;border-bottom:1px solid #f5f5f5; }
+.perm-row:last-child { border-bottom:none; }
+.perm-label { font-size:13px;color:#333; }
+.perm-hint { font-size:11px;color:#aaa;margin-top:1px; }
+/* Toggle switch (same style as main app) */
+.toggle-switch { position:relative;display:inline-flex;cursor:pointer; }
+.toggle-switch input { opacity:0;width:0;height:0;position:absolute; }
+.toggle-track { width:40px;height:22px;background:#d1d5db;border-radius:22px;transition:.2s;position:relative; }
+.toggle-thumb { position:absolute;top:3px;left:3px;width:16px;height:16px;background:#fff;border-radius:50%;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.2); }
+.toggle-switch input:checked ~ .toggle-track { background:#6c63ff; }
+.toggle-switch input:checked ~ .toggle-track .toggle-thumb { transform:translateX(18px); }
+.modal-actions { display:flex;gap:10px;justify-content:flex-end;margin-top:20px; }
+.err-box { background:#fff1f0;border:1px solid #ffa39e;color:#cf1322;border-radius:8px;padding:9px 13px;font-size:12px;margin-bottom:14px;display:none; }
+.back-link { display:inline-flex;align-items:center;gap:6px;color:#6c63ff;font-size:13px;text-decoration:none;margin-bottom:16px; }
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="logo-icon">ZK</div>
+    <div class="topbar-title">User Management</div>
+  </div>
+  <div class="topbar-right">
+    <span id="current-user" style="font-size:13px;color:#888"></span>
+    <a href="/" class="btn btn-ghost">Dashboard</a>
+    <button class="btn btn-ghost" onclick="logout()">Logout</button>
+  </div>
+</div>
+
+<main>
+  <a href="/" class="back-link">← Back to Dashboard</a>
+  <h1>User Management</h1>
+  <p class="sub">Manage users and roles. Admin and superadmin can create/edit/delete. Only superadmin can assign superadmin role.</p>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Users</div>
+      <button class="btn btn-primary btn-sm" id="btn-add-user" onclick="openAddUser()">+ Add User</button>
+    </div>
+    <table>
+      <thead><tr><th>Username</th><th>Role</th><th>Created</th><th>Actions</th></tr></thead>
+      <tbody id="users-tbody"><tr><td colspan="4" style="text-align:center;color:#aaa;padding:24px">Loading…</td></tr></tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Roles &amp; Permissions</div>
+      <button class="btn btn-primary btn-sm" id="btn-add-role" onclick="openAddRole()">+ Add Role</button>
+    </div>
+    <table>
+      <thead><tr><th>Role</th><th>Nav</th><th>Employees</th><th>Devices</th><th>Attendance</th><th>Actions</th></tr></thead>
+      <tbody id="roles-tbody"><tr><td colspan="6" style="text-align:center;color:#aaa;padding:24px">Loading…</td></tr></tbody>
+    </table>
+  </div>
+</main>
+
+<!-- User modal -->
+<div class="overlay" id="user-modal">
+  <div class="modal">
+    <h3 id="user-modal-title">Add User</h3>
+    <div class="err-box" id="user-err"></div>
+    <div class="form-group">
+      <label>Username</label>
+      <input type="text" id="f-username" placeholder="e.g. john" autocomplete="off">
+    </div>
+    <div class="form-group">
+      <label id="f-pass-label">Password</label>
+      <input type="password" id="f-password" placeholder="Min 6 characters" autocomplete="new-password">
+    </div>
+    <div class="form-group">
+      <label>Role</label>
+      <select id="f-role"></select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('user-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveUser()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Role modal -->
+<div class="overlay" id="role-modal">
+  <div class="modal">
+    <h3 id="role-modal-title">Add Role</h3>
+    <div class="err-box" id="role-err"></div>
+    <div class="form-group" id="role-name-group">
+      <label>Role Name</label>
+      <input type="text" id="f-role-name" placeholder="e.g. operator">
+    </div>
+    <div class="form-group">
+      <label style="margin-bottom:10px;display:block">Permissions</label>
+      <div id="perm-editor"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('role-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveRole()">Save Role</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const PERM_SCHEMA = {
+  nav: {
+    label: 'Navigation Menu',
+    items: {
+      dashboard:  { label: 'Dashboard',  hint: 'Overview stats and activity' },
+      devices:    { label: 'Devices',    hint: 'Device management page' },
+      employees:  { label: 'Employees',  hint: 'Employee management page' },
+      attendance: { label: 'Attendance', hint: 'Attendance records page' },
+      logs:       { label: 'Logs',       hint: 'System logs page' },
+      settings:   { label: 'Settings',   hint: 'Configuration page' },
+      guide:      { label: 'User Guide', hint: 'Help and documentation' },
+    }
+  },
+  employees: {
+    label: 'Employees Page',
+    items: {
+      btn_load_laravel:  { label: 'Button: Load from Laravel', hint: 'Fetch employees from Laravel API' },
+      btn_load_machine:  { label: 'Button: Load from Machine', hint: 'Load employees from ZKTeco device' },
+      btn_set_device:    { label: 'Button: Set to Device',     hint: 'Push employees to connected device' },
+      btn_add_employee:  { label: 'Button: Add Employee',      hint: 'Manually create a new employee' },
+      export_csv:        { label: 'Export CSV button',         hint: 'Download employee list as CSV' },
+      export_dat:        { label: 'Export DAT (USB) button',   hint: 'Download user.dat for USB import' },
+      card_export_guide: { label: 'Card: Export Guide',        hint: 'Instructions for CSV/DAT export' },
+      card_api_docs:     { label: 'Card: Laravel API Docs',    hint: 'Code snippet for Laravel endpoint' },
+    }
+  },
+  devices: {
+    label: 'Devices Page',
+    items: {
+      card_add_tcp:   { label: 'Card: Add TCP/IP Device', hint: 'Form to connect ZKTeco TCP devices' },
+      card_adms_info: { label: 'Card: ADMS Push Server',  hint: 'ADMS server address info' },
+      card_ping_test: { label: 'Card: Ping Test',         hint: 'Network reachability test tool' },
+    }
+  },
+  attendance: {
+    label: 'Attendance Page',
+    items: {
+      btn_fetch:        { label: 'Button: Fetch from Devices', hint: 'Pull attendance from TCP devices' },
+      btn_push_laravel: { label: 'Button: Push to Laravel',    hint: 'Send attendance records to Laravel' },
+    }
+  },
+};
+
+let me = null;
+let editingUserId = null;
+let editingRoleId = null;
+let roles = [];
+
+async function init() {
+  const res = await fetch('/api/auth/me');
+  if (!res.ok) { window.location.href = '/login'; return; }
+  me = await res.json();
+  document.getElementById('current-user').textContent = me.username + ' (' + me.role + ')';
+  const canManage = me.role === 'superadmin' || me.role === 'admin';
+  if (!canManage) {
+    document.getElementById('btn-add-user').style.display = 'none';
+    document.getElementById('btn-add-role').style.display = 'none';
+  }
+  await loadRoles();
+  loadUsers();
+}
+
+// ── Permission editor ──────────────────────────────────────────────
+
+function buildPermEditor(currentPerms) {
+  const container = document.getElementById('perm-editor');
+  container.innerHTML = '';
+  for (const [section, schema] of Object.entries(PERM_SCHEMA)) {
+    const secPerms = (currentPerms && currentPerms[section]) || {};
+    const rows = Object.entries(schema.items).map(([key, meta]) => {
+      const checked = secPerms[key] !== false ? 'checked' : '';
+      return `<div class="perm-row">
+        <div>
+          <div class="perm-label">${meta.label}</div>
+          <div class="perm-hint">${meta.hint}</div>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" data-section="${section}" data-key="${key}" ${checked}>
+          <span class="toggle-track"><span class="toggle-thumb"></span></span>
+        </label>
+      </div>`;
+    }).join('');
+
+    container.innerHTML += `
+      <div class="perm-section">
+        <div class="perm-section-head">
+          <span class="perm-section-title">${schema.label}</span>
+          <span class="perm-section-toggle" onclick="toggleSection('${section}',true)">All On</span>
+          &nbsp;
+          <span class="perm-section-toggle" onclick="toggleSection('${section}',false)">All Off</span>
+        </div>
+        <div class="perm-rows">${rows}</div>
+      </div>`;
+  }
+}
+
+function toggleSection(section, val) {
+  document.querySelectorAll(`input[data-section="${section}"]`).forEach(cb => cb.checked = val);
+}
+
+function readPermissions() {
+  const perms = {};
+  document.querySelectorAll('#perm-editor input[type=checkbox]').forEach(cb => {
+    const s = cb.dataset.section, k = cb.dataset.key;
+    if (!perms[s]) perms[s] = {};
+    perms[s][k] = cb.checked;
+  });
+  return perms;
+}
+
+// ── Roles ──────────────────────────────────────────────────────────
+
+async function loadRoles() {
+  const res = await fetch('/api/auth/roles');
+  const data = await res.json();
+  roles = data.roles || [];
+  renderRoles();
+}
+
+function countOn(obj) {
+  if (!obj) return '—';
+  const vals = Object.values(obj);
+  const on = vals.filter(v => v !== false).length;
+  return `${on}/${vals.length}`;
+}
+
+function renderRoles() {
+  const canManage = me?.role === 'superadmin' || me?.role === 'admin';
+  const tbody = document.getElementById('roles-tbody');
+  if (!roles.length) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#aaa;padding:24px">No roles</td></tr>'; return; }
+  tbody.innerHTML = roles.map(r => {
+    const p = r.permissions || {};
+    const cls = ['superadmin','admin','viewer'].includes(r.id) ? r.id : 'custom';
+    const locked = r.locked ? '<span class="tag-locked">built-in</span>' : '';
+    const actions = canManage
+      ? `<div class="actions">
+           <button class="btn btn-ghost btn-sm" onclick="openEditRole('${r.id}')">Edit</button>
+           ${!r.locked ? `<button class="btn btn-danger btn-sm" onclick="deleteRole('${r.id}','${r.name}')">Delete</button>` : ''}
+         </div>`
+      : '<span style="color:#ccc;font-size:12px">—</span>';
+    return `<tr>
+      <td><span class="badge badge-${cls}">${r.name}</span> ${locked}</td>
+      <td style="font-size:12px;color:#555">${countOn(p.nav)}</td>
+      <td style="font-size:12px;color:#555">${countOn(p.employees)}</td>
+      <td style="font-size:12px;color:#555">${countOn(p.devices)}</td>
+      <td style="font-size:12px;color:#555">${countOn(p.attendance)}</td>
+      <td>${actions}</td>
+    </tr>`;
+  }).join('');
+}
+
+function openAddRole() {
+  editingRoleId = null;
+  document.getElementById('role-modal-title').textContent = 'Add Role';
+  document.getElementById('f-role-name').value = '';
+  document.getElementById('f-role-name').disabled = false;
+  document.getElementById('role-name-group').style.display = '';
+  buildPermEditor(null);
+  document.getElementById('role-err').style.display = 'none';
+  document.getElementById('role-modal').classList.add('show');
+}
+
+function openEditRole(id) {
+  const role = roles.find(r => r.id === id);
+  if (!role) return;
+  editingRoleId = id;
+  document.getElementById('role-modal-title').textContent = 'Edit: ' + role.name;
+  document.getElementById('f-role-name').value = role.name;
+  document.getElementById('f-role-name').disabled = true;
+  document.getElementById('role-name-group').style.display = 'none';
+  buildPermEditor(role.permissions);
+  document.getElementById('role-err').style.display = 'none';
+  document.getElementById('role-modal').classList.add('show');
+}
+
+async function saveRole() {
+  const err = document.getElementById('role-err');
+  err.style.display = 'none';
+  const permissions = readPermissions();
+  let res, data;
+  if (editingRoleId) {
+    res = await fetch('/api/auth/roles/update', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ id: editingRoleId, permissions }) });
+  } else {
+    const name = document.getElementById('f-role-name').value.trim();
+    if (!name) { err.textContent = 'Role name is required'; err.style.display = 'block'; return; }
+    res = await fetch('/api/auth/roles/create', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ name, permissions }) });
+  }
+  data = await res.json();
+  if (data.success) { closeModal('role-modal'); await loadRoles(); populateRoleSelect(); }
+  else { err.textContent = data.error || 'Error'; err.style.display = 'block'; }
+}
+
+async function deleteRole(id, name) {
+  if (!confirm(`Delete role "${name}"?`)) return;
+  const res = await fetch('/api/auth/roles/delete', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ id }) });
+  const data = await res.json();
+  if (data.success) { await loadRoles(); populateRoleSelect(); }
+  else alert(data.error || 'Error');
+}
+
+// ── Users ──────────────────────────────────────────────────────────
+
+async function loadUsers() {
+  const res = await fetch('/api/auth/users');
+  const data = await res.json();
+  const tbody = document.getElementById('users-tbody');
+  const canManage = me?.role === 'superadmin' || me?.role === 'admin';
+  const rows = [];
+  if (data.masterUser) {
+    rows.push(`<tr>
+      <td><strong>${data.masterUser}</strong> <span class="tag-master">master (.env)</span></td>
+      <td><span class="badge badge-superadmin">superadmin</span></td>
+      <td>—</td>
+      <td><span style="color:#aaa;font-size:12px">Cannot be edited</span></td>
+    </tr>`);
+  }
+  for (const u of (data.users || [])) {
+    const cls = ['superadmin','admin','viewer'].includes(u.role) ? u.role : 'custom';
+    rows.push(`<tr>
+      <td><strong>${u.username}</strong></td>
+      <td><span class="badge badge-${cls}">${u.role}</span></td>
+      <td style="color:#888;font-size:12px">${u.createdAt ? new Date(u.createdAt).toLocaleDateString() : '—'}</td>
+      <td><div class="actions">
+        ${canManage ? `<button class="btn btn-ghost btn-sm" onclick="openEditUser('${u.id}','${u.username}','${u.role}')">Edit</button>` : ''}
+        ${canManage ? `<button class="btn btn-danger btn-sm" onclick="deleteUser('${u.id}','${u.username}')">Delete</button>` : ''}
+      </div></td>
+    </tr>`);
+  }
+  tbody.innerHTML = rows.length ? rows.join('') : '<tr><td colspan="4" style="text-align:center;color:#aaa;padding:24px">No users yet</td></tr>';
+}
+
+function populateRoleSelect(selected) {
+  const sel = document.getElementById('f-role');
+  sel.innerHTML = roles.map(r =>
+    `<option value="${r.id}" ${r.id === selected ? 'selected' : ''}>${r.name}</option>`
+  ).join('');
+  if (me?.role !== 'superadmin') {
+    [...sel.options].forEach(o => { if (o.value === 'superadmin') o.remove(); });
+  }
+}
+
+function openAddUser() {
+  editingUserId = null;
+  document.getElementById('user-modal-title').textContent = 'Add User';
+  document.getElementById('f-username').value = '';
+  document.getElementById('f-username').disabled = false;
+  document.getElementById('f-password').value = '';
+  document.getElementById('f-pass-label').textContent = 'Password';
+  populateRoleSelect('admin');
+  document.getElementById('user-err').style.display = 'none';
+  document.getElementById('user-modal').classList.add('show');
+}
+
+function openEditUser(id, username, role) {
+  editingUserId = id;
+  document.getElementById('user-modal-title').textContent = 'Edit User: ' + username;
+  document.getElementById('f-username').value = username;
+  document.getElementById('f-username').disabled = true;
+  document.getElementById('f-password').value = '';
+  document.getElementById('f-pass-label').textContent = 'New Password (leave blank to keep)';
+  populateRoleSelect(role);
+  document.getElementById('user-err').style.display = 'none';
+  document.getElementById('user-modal').classList.add('show');
+}
+
+async function saveUser() {
+  const err = document.getElementById('user-err');
+  err.style.display = 'none';
+  const username = document.getElementById('f-username').value.trim();
+  const password = document.getElementById('f-password').value;
+  const role = document.getElementById('f-role').value;
+  if (!editingUserId && !username) { err.textContent = 'Username is required'; err.style.display = 'block'; return; }
+  if (!editingUserId && password.length < 6) { err.textContent = 'Password must be at least 6 characters'; err.style.display = 'block'; return; }
+  const body = editingUserId
+    ? { id: editingUserId, role, ...(password ? { password } : {}) }
+    : { username, password, role };
+  const url = editingUserId ? '/api/auth/users/update' : '/api/auth/users/create';
+  const res = await fetch(url, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+  const data = await res.json();
+  if (data.success) { closeModal('user-modal'); loadUsers(); }
+  else { err.textContent = data.error || 'Error'; err.style.display = 'block'; }
+}
+
+async function deleteUser(id, username) {
+  if (!confirm(`Delete user "${username}"?`)) return;
+  const res = await fetch('/api/auth/users/delete', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ id }) });
+  const data = await res.json();
+  if (data.success) loadUsers();
+  else alert(data.error || 'Error');
+}
+
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+async function logout() {
+  await fetch('/api/auth/logout', { method:'POST' });
+  window.location.href = '/login';
+}
+
+init();
+</script>
+</body>
+</html>

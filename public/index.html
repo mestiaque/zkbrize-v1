@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZKTeco ↔ Laravel Bridge</title>
+<script src="https://cdn.socket.io/4.6.0/socket.io.min.js"></script>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="layout">
+
+  <!-- Sidebar -->
+  <nav class="sidebar">
+    <div class="brand">
+      <div class="brand-icon">ZK</div>
+      <div>
+        <div class="brand-name">ZK Bridge</div>
+        <div class="brand-sub">Laravel Connector</div>
+      </div>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-label">Overview</div>
+      <a class="nav-item active" data-page="dashboard" onclick="showPage('dashboard',this)">
+        <svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+        Dashboard
+      </a>
+      <a class="nav-item" data-page="devices" onclick="showPage('devices',this)">
+        <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V6h16v12zM6 10h2v2H6zm0 4h8v2H6zm10 0h2v2h-2zm-6-4h8v2h-8z"/></svg>
+        Devices
+        <span class="badge" id="nav-device-count">0</span>
+      </a>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-label">Data Sync</div>
+      <a class="nav-item" data-page="employees" onclick="showPage('employees',this)">
+        <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+        Employees
+      </a>
+      <a class="nav-item" data-page="attendance" onclick="showPage('attendance',this)">
+        <svg viewBox="0 0 24 24"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>
+        Attendance
+        <span class="badge" id="nav-attendance-count">0</span>
+      </a>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-label">System</div>
+      <a class="nav-item" data-page="logs" onclick="showPage('logs',this)">
+        <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+        Logs
+      </a>
+      <a class="nav-item" data-page="settings" onclick="showPage('settings',this)">
+        <svg viewBox="0 0 24 24"><path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/></svg>
+        Settings
+      </a>
+      <a class="nav-item" data-page="guide" onclick="showPage('guide',this)">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></svg>
+        User Guide
+      </a>
+    </div>
+
+    <div class="sidebar-bottom">
+      <div id="sidebar-user-info" style="padding:10px 16px 4px;font-size:12px;color:#888"></div>
+      <a href="/users" id="nav-users-link" style="display:none;padding:8px 16px;font-size:12px;color:#6c63ff;text-decoration:none;display:flex;align-items:center;gap:6px">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+        Manage Users
+      </a>
+      <button onclick="doLogout()" style="width:100%;padding:9px 16px;background:none;border:none;border-top:1px solid #f0f2f5;text-align:left;cursor:pointer;font-size:12px;color:#888;display:flex;align-items:center;gap:6px">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>
+        Logout
+      </button>
+    </div>
+
+    <div class="sidebar-status">
+      <div class="status-row">
+        <span class="status-dot" id="status-laravel"></span>
+        <span>Laravel API</span>
+      </div>
+      <div class="status-row">
+        <span class="status-dot" id="status-adms"></span>
+        <span>ADMS Server</span>
+      </div>
+      <div class="status-row">
+        <span class="status-dot" id="status-adms"></span>
+        <span>Natore-IT</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="main">
+
+    <!-- Top Bar -->
+    <div class="topbar">
+      <div class="topbar-title" id="page-title">Dashboard</div>
+      <div class="topbar-actions">
+        <div class="conn-status" id="socket-status">
+          <span class="status-dot offline"></span> Connecting...
+        </div>
+        <button class="btn" onclick="triggerSync()">
+          <svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/></svg>
+          Sync Now
+        </button>
+      </div>
+    </div>
+
+    <!-- Pages -->
+    <div id="page-dashboard" class="page active">
+      <!-- Stats -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon teal"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2z"/></svg></div>
+          <div class="stat-info">
+            <div class="stat-value" id="stat-total-devices">0</div>
+            <div class="stat-label">Total Devices</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon green"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg></div>
+          <div class="stat-info">
+            <div class="stat-value" id="stat-connected">0</div>
+            <div class="stat-label">Connected</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon blue"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2z"/></svg></div>
+          <div class="stat-info">
+            <div class="stat-value" id="stat-attendance">0</div>
+            <div class="stat-label">Attendance Records</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon amber"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg></div>
+          <div class="stat-info">
+            <div class="stat-value" id="stat-last-sync">Never</div>
+            <div class="stat-label">Last Sync</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <!-- Devices panel -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Connected Devices</div>
+            <button class="btn-sm" onclick="showPage('devices', document.querySelector('[data-page=devices]'))">Manage</button>
+          </div>
+          <div id="dashboard-devices">
+            <div class="empty-state">No devices connected yet</div>
+          </div>
+        </div>
+
+        <!-- Recent activity -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Recent Activity</div>
+            <button class="btn-sm" onclick="showPage('attendance', document.querySelector('[data-page=attendance]'))">View All</button>
+          </div>
+          <div id="dashboard-activity">
+            <div class="empty-state">No activity yet</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sync log -->
+      <div class="card mt">
+        <div class="card-header">
+          <div class="card-title">Sync History</div>
+        </div>
+        <div id="dashboard-synclog">
+          <div class="empty-state">No sync history</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Devices Page -->
+    <div id="page-devices" class="page">
+      <div class="section-header">
+        <div>
+          <h2>Device Management</h2>
+          <p class="sub">Connect and manage ZKTeco attendance devices</p>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <!-- Add TCP Device -->
+        <div class="card" id="card-add-tcp">
+          <div class="card-header"><div class="card-title">Add TCP/IP Device</div><span class="tag">Older devices</span></div>
+          <p class="hint">For older ZKTeco devices without ADMS push support. The bridge will pull data from these devices.</p>
+          <div class="form-group">
+            <label>Device IP Address</label>
+            <input type="text" id="tcp-ip" placeholder="192.168.1.100">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Port</label>
+              <input type="number" id="tcp-port" value="4370">
+            </div>
+            <div class="form-group">
+              <label>Device Name</label>
+              <input type="text" id="tcp-name" placeholder="Main Entrance">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Password (if set)</label>
+            <input type="text" id="tcp-password" placeholder="Leave empty if none">
+          </div>
+          <button class="btn btn-primary" onclick="connectTCPDevice()">
+            <svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm7 13H5v-.23c0-.62.28-1.2.76-1.58C7.47 15.82 9.64 15 12 15s4.53.82 6.24 2.19c.48.38.76.97.76 1.58V19z"/></svg>
+            Connect Device
+          </button>
+        </div>
+
+        <!-- ADMS Info -->
+        <div class="card" id="card-adms-info">
+          <div class="card-header"><div class="card-title">ADMS Push Server</div><span class="tag tag-green">Auto</span></div>
+          <p class="hint">Newer ZKTeco devices automatically push data here. Configure the device's server address to point to this machine.</p>
+          <div class="info-box">
+            <div class="info-row">
+              <span class="info-label">Server Address</span>
+              <span class="info-value" id="adms-address">http://&lt;this-ip&gt;:7788</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Port</span>
+              <span class="info-value" id="adms-port-display">7788</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Status</span>
+              <span class="badge-green">Listening</span>
+            </div>
+          </div>
+          <p class="hint mt">On your ZKTeco device: go to <strong>Comm → ADMS</strong> and set the server address above. Devices will push attendance in real-time.</p>
+        </div>
+      </div>
+
+      <!-- Ping Test -->
+      <div class="card mt" id="card-ping-test">
+        <div class="card-header"><div class="card-title">Network Ping Test</div><span class="tag">Reachability Check</span></div>
+        <p class="hint">Check if a ZKTeco device is reachable on the same network before connecting.</p>
+        <div style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap">
+          <div class="form-group" style="margin:0;flex:1;min-width:180px">
+            <label>Device IP Address</label>
+            <input type="text" id="ping-ip" placeholder="192.168.1.100" onkeydown="if(event.key==='Enter') pingDevice()">
+          </div>
+          <button class="btn btn-primary" onclick="pingDevice()" id="ping-btn">Ping</button>
+        </div>
+        <div id="ping-result" class="mt"></div>
+      </div>
+
+      <!-- Device List -->
+      <div class="card mt">
+        <div class="card-header">
+          <div class="card-title">All Devices</div>
+          <button class="btn-sm" onclick="loadDevices()">Refresh</button>
+        </div>
+        <div id="device-list">
+          <div class="empty-state">No devices configured</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Employees Page -->
+    <div id="page-employees" class="page">
+      <div class="section-header">
+        <div>
+          <h2>Employees</h2>
+          <p class="sub">Manage employees, sync with devices, and export for ZKTeco software</p>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-primary" id="import-laravel-btn" onclick="importFromLaravel()">
+            <svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M19 9h-4V3H9v6H5l7 7 7-7zm-8 2V5h2v6h1.17L12 13.17 9.83 11H11zm-6 7h14v2H5z"/></svg>
+            Load from Laravel
+          </button>
+          <button class="btn" id="load-machine-emp-btn" onclick="showLoadFromMachineModal()">
+            <svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-8 2.5c1.24 0 2.25 1.01 2.25 2.25S13.24 11 12 11s-2.25-1.01-2.25-2.25S10.76 6.5 12 6.5zM17 17H7v-1.29c0-1.52 3.14-2.21 5-2.21s5 .69 5 2.21V17z"/></svg>
+            Load from Machine
+          </button>
+          <button class="btn" id="set-emp-btn" onclick="setEmployeesToDevice()">
+            <svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V6h16v12zM6 10h2v2H6zm0 4h8v2H6zm10 0h2v2h-2zm-6-4h8v2h-8z"/></svg>
+            Set to Device
+          </button>
+          <button class="btn" id="create-emp-btn" onclick="openEmployeeModal(null)">
+            + Add Employee
+          </button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Employee List</div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <span id="emp-count-badge" style="display:none" class="tag tag-blue">0 employees</span>
+            <a id="export-csv-btn" href="/api/employees/export.csv" download style="display:none" class="btn-sm">
+              ⬇ Export CSV
+            </a>
+            <a id="export-dat-btn" href="/api/employees/export.dat" download style="display:none" class="btn-sm">
+              ⬇ Export DAT (USB)
+            </a>
+          </div>
+        </div>
+        <div id="employee-table-wrap">
+          <div class="empty-state">Click "Load from Laravel" or "Load from Machine" to load employees</div>
+        </div>
+        <div id="employee-sync-status" class="mt"></div>
+      </div>
+
+      <div class="card mt" id="card-export-guide">
+        <div class="card-header"><div class="card-title">Export Guide</div></div>
+        <div style="padding:12px 16px;font-size:13px;line-height:1.8;color:var(--text-secondary)">
+          <strong>Export CSV</strong> → ZKBio Security / ZKTime.Net software e import kora jay<br>
+          <strong>Export DAT (USB)</strong> → Pendrive e <code>user.dat</code> save kore ZKTeco device e import kora jay<br>
+          <em>Device e USB import: Menu → USB Manager → Upload → User Info</em>
+        </div>
+      </div>
+
+      <div class="card mt" id="card-api-docs">
+        <div class="card-header">
+          <div class="card-title">Laravel API Endpoints Required</div>
+        </div>
+        <div class="code-block">
+<pre>// routes/api.php
+Route::middleware('auth:sanctum')->prefix('zk')->group(function() {
+    Route::get('/ping',       [ZKController::class, 'ping']);
+    Route::get('/employees',  [ZKController::class, 'employees']);
+    Route::post('/attendance',[ZKController::class, 'storeAttendance']);
+});
+
+// ZKController::employees() response format:
+{
+  "data": [
+    {
+      "id": 1,
+      "employee_id": "EMP001",
+      "name": "John Doe",
+      "uid": 1,          // ZKTeco user ID (1-65535)
+      "privilege": 0,    // 0=user, 14=admin
+      "password": ""
+    }
+  ]
+}
+
+// ZKController::storeAttendance() accepts:
+{
+  "records": [
+    {
+      "employee_id": "EMP001",
+      "time": "2024-01-15 09:00:00",
+      "status": "0",     // 0=check-in, 1=check-out
+      "device_id": "...",
+      "source": "adms"
+    }
+  ]
+}</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- Attendance Page -->
+    <div id="page-attendance" class="page">
+      <div class="section-header">
+        <div>
+          <h2>Attendance Records</h2>
+          <p class="sub">Real-time attendance data from all devices</p>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn" id="btn-fetch-attendance" onclick="fetchAttendance()">Fetch from Devices</button>
+          <button class="btn btn-primary" id="btn-push-laravel" onclick="pushToLaravel()">Push to Laravel</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Live Records <span id="att-count-badge" class="tag tag-blue" style="display:none"></span></div>
+          <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+            <input type="text" id="filter-empid" placeholder="Employee ID..." style="width:130px;padding:5px 8px;border:1px solid #e5e7eb;border-radius:6px;font-size:12px" oninput="filterAttendance()">
+            <input type="date" id="filter-date" style="padding:5px 8px;border:1px solid #e5e7eb;border-radius:6px;font-size:12px" onchange="filterAttendance()">
+            <select id="filter-device" onchange="filterAttendance()" style="padding:5px 8px;border:1px solid #e5e7eb;border-radius:6px;font-size:12px">
+              <option value="">All Devices</option>
+            </select>
+            <select id="filter-status" onchange="filterAttendance()" style="padding:5px 8px;border:1px solid #e5e7eb;border-radius:6px;font-size:12px">
+              <option value="">All Types</option>
+              <option value="0">Check In</option>
+              <option value="1">Check Out</option>
+            </select>
+            <select id="filter-method" onchange="filterAttendance()" style="padding:5px 8px;border:1px solid #e5e7eb;border-radius:6px;font-size:12px">
+              <option value="">All Methods</option>
+              <option value="face">Face</option>
+              <option value="fingerprint">Fingerprint</option>
+              <option value="card">Card</option>
+              <option value="password">Password</option>
+            </select>
+            <select id="filter-source" onchange="filterAttendance()" style="padding:5px 8px;border:1px solid #e5e7eb;border-radius:6px;font-size:12px">
+              <option value="">All Sources</option>
+              <option value="adms">ADMS</option>
+              <option value="tcp">TCP</option>
+            </select>
+            <select id="filter-pushed" onchange="filterAttendance()" style="padding:5px 8px;border:1px solid #e5e7eb;border-radius:6px;font-size:12px">
+              <option value="">All Status</option>
+              <option value="new">New (Not Pushed)</option>
+              <option value="pushed">Pushed</option>
+            </select>
+            <button class="btn-sm" onclick="clearAttendanceFilters()">Clear</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table" id="attendance-table">
+            <thead>
+              <tr>
+                <th>Status</th>
+                <th>Employee ID</th>
+                <th>Date &amp; Time</th>
+                <th>Type</th>
+                <th>Method</th>
+                <th>Device</th>
+                <th>Source</th>
+                <th>Pushed At</th>
+              </tr>
+            </thead>
+            <tbody id="attendance-tbody">
+              <tr><td colspan="8" class="empty-cell">No records yet. Connect a device to start receiving attendance.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Logs Page -->
+    <div id="page-logs" class="page">
+      <div class="section-header">
+        <div><h2>System Logs</h2><p class="sub">Server activity and debug information</p></div>
+        <div style="display:flex;gap:8px">
+          <button class="btn" onclick="loadLogs()">Refresh</button>
+          <button class="btn" style="color:var(--red)" onclick="clearAllLogs()">Clear Logs</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="log-container" id="log-container">
+          <div class="empty-state">Loading logs...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings Page -->
+    <div id="page-settings" class="page">
+      <div class="section-header">
+        <div><h2>Settings</h2><p class="sub">Configure Laravel connection and sync schedules</p></div>
+      </div>
+
+      <div class="two-col">
+        <div class="card">
+          <div class="card-header"><div class="card-title">Laravel API Configuration</div></div>
+          <div class="form-group">
+            <label>Laravel API Base URL</label>
+            <input type="url" id="set-laravel-url" placeholder="https://yourapp.com/api">
+            <span class="field-hint">Include /api — e.g. https://myapp.com/api</span>
+          </div>
+          <div class="form-group">
+            <label>API Token (Bearer) <span style="color:var(--text-3);font-weight:400">— optional</span></label>
+            <input type="password" id="set-laravel-token" placeholder="Leave empty if not required">
+            <span class="field-hint">Laravel Sanctum / Passport token (leave blank if public route)</span>
+          </div>
+          <div class="form-group">
+            <label>Fetch Employee URL</label>
+            <input type="url" id="set-fetch-employee-url" placeholder="https://yourapp.com/fetch-employee">
+            <span class="field-hint">GET — bridge will call this to get employee list</span>
+          </div>
+          <div class="form-group">
+            <label>Sync Attendance URL</label>
+            <input type="url" id="set-sync-attendance-url" placeholder="https://yourapp.com/sync-to-laravel">
+            <span class="field-hint">POST — bridge will push attendance records here</span>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-primary" onclick="saveConfig()">Save Config</button>
+            <button class="btn" onclick="testLaravel()">Test Connection</button>
+          </div>
+          <div id="laravel-test-result" class="mt"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><div class="card-title">Sync Schedule</div></div>
+
+          <!-- Employee Sync -->
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 0 10px">
+            <div>
+              <div style="font-size:13px;font-weight:600">Employee Sync</div>
+              <div class="field-hint" id="emp-sync-status-text">Syncs employees from Laravel to devices</div>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="toggle-employee-sync" onchange="toggleSync('employee')">
+              <span class="toggle-track"><span class="toggle-thumb"></span></span>
+            </label>
+          </div>
+          <div class="form-group" id="emp-sync-fields">
+            <label>Employee Sync (Cron)</label>
+            <input type="text" id="set-sync-schedule" placeholder="*/30 * * * *">
+            <span class="field-hint">e.g. */30 * * * * = every 30 minutes</span>
+          </div>
+
+          <div style="height:1px;background:#f0f2f5;margin:12px 0"></div>
+
+          <!-- Attendance Push -->
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 0 10px">
+            <div>
+              <div style="font-size:13px;font-weight:600">Attendance Push</div>
+              <div class="field-hint" id="att-sync-status-text">Pushes new attendance records to Laravel automatically</div>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="toggle-attendance-sync" onchange="toggleSync('attendance')">
+              <span class="toggle-track"><span class="toggle-thumb"></span></span>
+            </label>
+          </div>
+          <div class="form-group" id="att-sync-fields">
+            <label>Attendance Push (Cron)</label>
+            <input type="text" id="set-fetch-schedule" placeholder="*/15 * * * *">
+            <span class="field-hint">e.g. */15 * * * * = every 15 minutes — pushes unpushed records to Laravel</span>
+          </div>
+
+          <div class="schedule-presets">
+            <button class="preset-btn" onclick="setSchedule('*/5 * * * *','*/5 * * * *')">Every 5 min</button>
+            <button class="preset-btn" onclick="setSchedule('*/15 * * * *','*/15 * * * *')">Every 15 min</button>
+            <button class="preset-btn" onclick="setSchedule('*/30 * * * *','*/30 * * * *')">Every 30 min</button>
+            <button class="preset-btn" onclick="setSchedule('0 * * * *','*/15 * * * *')">Hourly</button>
+          </div>
+          <button class="btn btn-primary mt" onclick="saveConfig()">Save Schedule</button>
+        </div>
+      </div>
+
+      <div class="card mt">
+        <div class="card-header"><div class="card-title">ADMS Server Info</div></div>
+        <div class="info-grid">
+          <div class="info-item">
+            <div class="info-item-label">ADMS Port</div>
+            <div class="info-item-value" id="settings-adms-port">5015</div>
+          </div>
+          <div class="info-item">
+            <div class="info-item-label">Status</div>
+            <div class="info-item-value badge-green">Running</div>
+          </div>
+          <div class="info-item">
+            <div class="info-item-label">Protocol</div>
+            <div class="info-item-value">HTTP Push</div>
+          </div>
+          <div class="info-item">
+            <div class="info-item-label">Device URL</div>
+            <div class="info-item-value" id="settings-adms-url">http://&lt;server-ip&gt;:5015</div>
+          </div>
+        </div>
+        <div class="form-group mt" style="max-width:320px">
+          <label>Change ADMS Port</label>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input type="number" id="set-adms-port" placeholder="e.g. 5015" min="1024" max="65535" style="width:140px">
+            <button class="btn btn-primary btn-sm" onclick="saveAdmsPort()">Save &amp; Apply</button>
+          </div>
+          <span class="field-hint">Takes effect immediately — no restart needed. Current: <strong id="adms-port-current">5015</strong></span>
+        </div>
+        <div class="form-group mt">
+          <button class="btn btn-ghost btn-sm" onclick="restartServer()" style="color:#cf1322;border-color:#ffa39e">
+            ↺ Restart Server
+          </button>
+          <span class="field-hint" style="margin-left:8px">Applies port changes. Server will be back in ~2s (PM2 required).</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Guide Page -->
+    <div id="page-guide" class="page">
+      <div class="section-header">
+        <div><h2>User Guide</h2><p class="sub">Setup instructions, device configuration and API reference</p></div>
+      </div>
+
+      <div class="guide-layout">
+
+        <!-- TOC -->
+        <div class="guide-toc">
+          <div class="guide-toc-title">Contents</div>
+          <a class="guide-toc-item" href="#g-quickstart">Quick Start</a>
+          <a class="guide-toc-item" href="#g-device">Device Settings</a>
+          <a class="guide-toc-item" href="#g-network">Network Setup</a>
+          <a class="guide-toc-item" href="#g-server">Server Settings</a>
+          <a class="guide-toc-item" href="#g-api">API Reference</a>
+          <a class="guide-toc-item" href="#g-laravel">Laravel Example</a>
+          <a class="guide-toc-item" href="#g-trouble">Troubleshooting</a>
+        </div>
+
+        <!-- Content -->
+        <div class="guide-content">
+
+          <!-- Quick Start -->
+          <div class="guide-section" id="g-quickstart">
+            <div class="guide-section-title">
+              <span class="guide-num">1</span> Quick Start
+            </div>
+            <div class="guide-steps">
+              <div class="guide-step">
+                <div class="guide-step-num">1</div>
+                <div>Start the bridge server: <code>node src/server.js</code></div>
+              </div>
+              <div class="guide-step">
+                <div class="guide-step-num">2</div>
+                <div>Go to <strong>Settings</strong> → enter your API URLs → Save</div>
+              </div>
+              <div class="guide-step">
+                <div class="guide-step-num">3</div>
+                <div>On your ZKTeco device set Server Address to this machine's IP and Port to <strong>5015</strong></div>
+              </div>
+              <div class="guide-step">
+                <div class="guide-step-num">4</div>
+                <div>Restart the device — it will appear in <strong>Devices</strong> page automatically</div>
+              </div>
+              <div class="guide-step">
+                <div class="guide-step-num">5</div>
+                <div>Fingerprint punches will show in <strong>Attendance</strong> in real-time</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Device Settings -->
+          <div class="guide-section" id="g-device">
+            <div class="guide-section-title">
+              <span class="guide-num">2</span> Device Settings (ZKTeco MB10-VL)
+            </div>
+
+            <div class="guide-sub">Cloud Server Settings — <code>Menu → Comm → Cloud Server Settings</code></div>
+            <table class="guide-table">
+              <thead><tr><th>Field</th><th>Value</th><th>Note</th></tr></thead>
+              <tbody>
+                <tr><td>Server Mode</td><td><span class="tag tag-blue">ADMS</span></td><td>Must be ADMS, not ADMS2</td></tr>
+                <tr><td>Enable Domain Name</td><td><span class="tag">OFF</span></td><td>Use IP address directly</td></tr>
+                <tr><td>Server Address</td><td><code>192.168.x.x</code></td><td>This machine's LAN IP</td></tr>
+                <tr><td>Server Port</td><td><code>5015</code></td><td>Bridge ADMS port</td></tr>
+                <tr><td>HTTPS</td><td><span class="tag tag-red">OFF</span></td><td>No SSL — must be OFF</td></tr>
+                <tr><td>Enable Proxy Server</td><td><span class="tag">OFF</span></td><td></td></tr>
+              </tbody>
+            </table>
+
+            <div class="guide-sub" style="margin-top:16px">PC Connection — <code>Menu → Comm → PC Connection</code></div>
+            <table class="guide-table">
+              <thead><tr><th>Field</th><th>Value</th><th>Note</th></tr></thead>
+              <tbody>
+                <tr><td>Comm Key</td><td>—</td><td>Leave empty</td></tr>
+                <tr><td>Device ID</td><td><code>1</code></td><td>Keep as-is</td></tr>
+                <tr><td>TCP COMM Port</td><td><code>4370</code></td><td>Only needed for TCP/IP mode</td></tr>
+                <tr><td>HTTPS</td><td><span class="tag tag-red">OFF</span></td><td>Must be OFF</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Network -->
+          <div class="guide-section" id="g-network">
+            <div class="guide-section-title">
+              <span class="guide-num">3</span> Network Setup
+            </div>
+            <div class="guide-alert guide-alert-warn">
+              Device and server must be on the <strong>same subnet</strong>. The first 3 parts of the IP must match.
+            </div>
+            <table class="guide-table" style="margin-top:12px">
+              <thead><tr><th></th><th>IP Example</th><th>Subnet</th><th>Status</th></tr></thead>
+              <tbody>
+                <tr><td>Server</td><td><code>192.168.110.54</code></td><td>192.168.110.x</td><td><span class="tag tag-green">OK</span></td></tr>
+                <tr><td>Device</td><td><code>192.168.110.100</code></td><td>192.168.110.x</td><td><span class="tag tag-green">OK</span></td></tr>
+                <tr><td>Device (wrong)</td><td><code>192.168.0.203</code></td><td>192.168.0.x</td><td><span class="tag tag-red">FAIL</span></td></tr>
+              </tbody>
+            </table>
+            <div class="guide-sub" style="margin-top:14px">Check server IP:</div>
+            <div class="code-block"><pre>ip addr show
+# or
+hostname -I</pre></div>
+            <div class="guide-sub" style="margin-top:14px">Use <strong>Devices → Network Ping Test</strong> to verify connectivity before connecting.</div>
+          </div>
+
+          <!-- Server Settings -->
+          <div class="guide-section" id="g-server">
+            <div class="guide-section-title">
+              <span class="guide-num">4</span> Server Settings
+            </div>
+            <table class="guide-table">
+              <thead><tr><th>Setting</th><th>Description</th></tr></thead>
+              <tbody>
+                <tr><td>Fetch Employee URL</td><td>Full URL where bridge fetches employees (GET)</td></tr>
+                <tr><td>Sync Attendance URL</td><td>Full URL where bridge pushes attendance (POST)</td></tr>
+                <tr><td>API Token</td><td>Bearer token — leave blank if route is public</td></tr>
+                <tr><td>ADMS Port</td><td>Default <code>5015</code> — set in <code>.env</code> as <code>ADMS_PORT</code></td></tr>
+              </tbody>
+            </table>
+            <div class="guide-sub" style="margin-top:14px"><code>.env</code> file reference:</div>
+            <div class="code-block"><pre>ADMS_PORT=5015
+FETCH_EMPLOYEE_URL=https://yourapp.com/fetch-employee
+SYNC_ATTENDANCE_URL=https://yourapp.com/sync-to-laravel
+LARAVEL_API_TOKEN=your-token-here</pre></div>
+          </div>
+
+          <!-- API Reference -->
+          <div class="guide-section" id="g-api">
+            <div class="guide-section-title">
+              <span class="guide-num">5</span> API Reference
+            </div>
+
+            <div class="guide-sub">GET /fetch-employee — bridge calls this to get employees</div>
+            <div class="code-block"><pre>{
+  "data": [
+    {
+      "uid": 1,
+      "employee_id": "EMP001",
+      "name": "Rahim Uddin",
+      "privilege": 0,
+      "password": "",
+      "card": ""
+    }
+  ]
+}</pre></div>
+            <table class="guide-table" style="margin-top:10px">
+              <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+              <tbody>
+                <tr><td><code>uid</code></td><td>integer</td><td>ZKTeco internal ID (1–65535)</td></tr>
+                <tr><td><code>employee_id</code></td><td>string</td><td>Your HR system ID</td></tr>
+                <tr><td><code>name</code></td><td>string</td><td>Full name</td></tr>
+                <tr><td><code>privilege</code></td><td>integer</td><td><code>0</code> = User, <code>14</code> = Admin</td></tr>
+                <tr><td><code>password</code></td><td>string</td><td>Device PIN (leave empty)</td></tr>
+              </tbody>
+            </table>
+
+            <div class="guide-sub" style="margin-top:20px">POST /sync-to-laravel — bridge sends attendance here</div>
+            <div class="code-block"><pre>{
+  "records": [
+    {
+      "employee_id": "EMP001",
+      "time": "2024-06-22 09:15:30",
+      "status": "0",
+      "device_id": "CGXK241360001",
+      "source": "adms",
+      "verify": "1",
+      "received_at": "2024-06-22T03:15:31.000Z"
+    }
+  ]
+}</pre></div>
+            <table class="guide-table" style="margin-top:10px">
+              <thead><tr><th>Field</th><th>Value</th></tr></thead>
+              <tbody>
+                <tr><td><code>employee_id</code></td><td>Device registered PIN/ID</td></tr>
+                <tr><td><code>time</code></td><td>Punch time — <code>YYYY-MM-DD HH:MM:SS</code></td></tr>
+                <tr><td><code>status</code></td><td><code>0</code> = Check In &nbsp;|&nbsp; <code>1</code> = Check Out</td></tr>
+                <tr><td><code>verify</code></td><td><code>1</code> = Fingerprint &nbsp;|&nbsp; <code>2</code> = Face &nbsp;|&nbsp; <code>3</code> = Card</td></tr>
+                <tr><td><code>source</code></td><td><code>adms</code> or <code>tcp</code></td></tr>
+              </tbody>
+            </table>
+            <div class="guide-sub" style="margin-top:10px">Expected response from your server:</div>
+            <div class="code-block"><pre>{ "success": true, "saved": 1 }</pre></div>
+          </div>
+
+          <!-- Laravel Example -->
+          <div class="guide-section" id="g-laravel">
+            <div class="guide-section-title">
+              <span class="guide-num">6</span> Laravel Controller Example
+            </div>
+            <div class="code-block"><pre>// routes/api.php
+Route::get('/fetch-employee',   [ZKController::class, 'fetchEmployee']);
+Route::post('/sync-to-laravel', [ZKController::class, 'syncAttendance']);
+
+// ZKController.php
+public function fetchEmployee()
+{
+    $employees = Employee::all()->map(fn($e) => [
+        'uid'         => $e->id,
+        'employee_id' => $e->employee_id,
+        'name'        => $e->name,
+        'privilege'   => 0,
+        'password'    => '',
+    ]);
+    return response()->json(['data' => $employees]);
+}
+
+public function syncAttendance(Request $request)
+{
+    $records = $request->input('records', []);
+    foreach ($records as $rec) {
+        Attendance::updateOrCreate(
+            ['employee_id' => $rec['employee_id'], 'punch_time' => $rec['time']],
+            ['status' => $rec['status'], 'device_id' => $rec['device_id'], 'source' => $rec['source']]
+        );
+    }
+    return response()->json(['success' => true, 'saved' => count($records)]);
+}</pre></div>
+          </div>
+
+          <!-- Troubleshooting -->
+          <div class="guide-section" id="g-trouble">
+            <div class="guide-section-title">
+              <span class="guide-num">7</span> Troubleshooting
+            </div>
+            <table class="guide-table">
+              <thead><tr><th>Problem</th><th>Solution</th></tr></thead>
+              <tbody>
+                <tr><td>Device not showing in Devices page</td><td>Check Server Address & Port on device. Ping test karon. Ensure same subnet.</td></tr>
+                <tr><td>Attendance showing Device: UNKNOWN</td><td>Server restart diye abar finger din. Check Logs page for RAW POST line.</td></tr>
+                <tr><td>Ping test fails</td><td>Device & server different subnet-e. Device IP change kore server-er subnet-e ano.</td></tr>
+                <tr><td>Laravel test fails</td><td>API URL check karon — sheshe <code>/api</code> ache kina. Token sothik ache kina.</td></tr>
+                <tr><td>Attendance not pushing to Laravel</td><td>Sync Attendance URL set ache kina Settings-e check karon. Logs-e error dekhan.</td></tr>
+                <tr><td>ADMS not connecting</td><td>Device-e HTTPS must be OFF. Port 5015. Server firewall port 5015 open ache kina.</td></tr>
+                <tr><td>Employee fetch fails</td><td>Fetch Employee URL set ache kina. API response format check karon — <code>data</code> array dorkar.</td></tr>
+              </tbody>
+            </table>
+
+            <div class="guide-alert guide-alert-info" style="margin-top:16px">
+              <strong>Logs page</strong> — server-er sob activity dekhte paben. ADMS connection hole dekhaben:<br>
+              <code style="font-size:11px">ADMS handshake from SN=XXXXXX ip=192.168.x.x</code><br>
+              <code style="font-size:11px">ADMS XXXXXX saved 1 attendance records</code>
+            </div>
+          </div>
+
+        </div><!-- /guide-content -->
+      </div><!-- /guide-layout -->
+    </div>
+
+  </main>
+</div>
+
+<!-- Toast container -->
+<div id="toast-container"></div>
+
+<!-- Load from Machine Modal removed — loads directly from bridge store -->
+
+<!-- Create / Edit Employee Modal -->
+<div id="modal-employee" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeModal('modal-employee')">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title" id="emp-modal-title">Add Employee</div>
+      <button class="modal-close" onclick="closeModal('modal-employee')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="emp-modal-uid">
+      <div class="form-row">
+        <div class="form-group">
+          <label>UID <span style="color:var(--text-3);font-size:11px">(ZKTeco internal, 1–65535)</span></label>
+          <input type="number" id="emp-modal-uid-input" min="1" max="65535" placeholder="e.g. 1">
+        </div>
+        <div class="form-group">
+          <label>Employee ID</label>
+          <input type="text" id="emp-modal-empid" placeholder="e.g. EMP001" maxlength="8">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" id="emp-modal-name" placeholder="John Doe" maxlength="24">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Password / PIN</label>
+          <input type="text" id="emp-modal-password" placeholder="Leave empty if none" maxlength="8">
+        </div>
+        <div class="form-group">
+          <label>Role</label>
+          <select id="emp-modal-privilege">
+            <option value="0">User</option>
+            <option value="14">Admin</option>
+          </select>
+        </div>
+      </div>
+      <div id="emp-modal-error" style="color:var(--red);font-size:13px;margin-top:4px;display:none"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('modal-employee')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveEmployeeToMachine()">Save to Machine</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/app.js"></script>
+</body>
+</html>
