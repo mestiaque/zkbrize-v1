@@ -36,8 +36,8 @@ function buildUpsertCommands(empsToSync) {
     const pass = e.password || '';
     // DELETE first (ignore error — user may not exist yet)
     commands.push({ id: cmdSerial++, cmd: `DATA DELETE UserInfo PIN=${pin}`, ignoreError: true });
-    // INSERT: match DELETE syntax pattern (no tablename= prefix)
-    commands.push({ id: cmdSerial++, cmd: `DATA UPDATE UserInfo PIN=${pin}&Name=${name}&Pri=${pri}&Passwd=${pass}&Card=0&Grp=1&TZ=0000111100000000&Verify=0&ViceCard=0` });
+    // INSERT: ZKTeco uses tab as field separator, not &
+    commands.push({ id: cmdSerial++, cmd: `DATA UPDATE UserInfo PIN=${pin}\tName=${name}\tPri=${pri}\tPasswd=${pass}\tCard=0\tGrp=1\tTZ=0000111100000000\tVerify=0\tViceCard=0` });
   }
   return commands;
 }
