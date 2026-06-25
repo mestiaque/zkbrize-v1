@@ -50,28 +50,38 @@ function buildUpsertCommands(empsToSync, isNew = false) {
 }
 
 function requestUsersFromADMS(sn) {
-  // If device already pushed its user list (cache hit within last 2 hours), return immediately
+  // Cache hit — return immediately, trigger background refresh
   const cache = deviceUserCache[sn];
   if (cache && cache.employees.length > 0) {
     const ageMin = (Date.now() - cache.receivedAt) / 60000;
     logger.info(`ADMS returning cached user list for SN=${sn} (${cache.employees.length} users, ${Math.round(ageMin)}min ago)`);
-    // Trigger background refresh for next time
     pendingOptionPush.add(sn);
     return Promise.resolve({ employees: cache.employees, fromCache: true });
   }
 
-  // No cache — wait for device to push via UserInfoStamp=None
   return new Promise((resolve, reject) => {
     const timer = setTimeout(() => {
       delete pendingUserRequests[sn];
       pendingOptionPush.delete(sn);
-      reject(new Error('Device did not push user list. This firmware may not support automatic user sync. Try reconnecting the device.'));
+      reject(new Error(
+        'Device did not push user list in 30s. ' +
+        'This firmware may not support user sync via ADMS. ' +
+        'To fix: on device go to Menu → Comm → ADMS → and enable "Push User Data", then try again.'
+      ));
     }, 30000);
 
     pendingUserRequests[sn] = { resolve, reject, timer };
+
+    // Approach 1: UserInfoStamp=None in next option block (standard ADMS pull trigger)
     pendingOptionPush.add(sn);
-    clearQueue(sn);
-    logger.info(`ADMS waiting for user list from SN=${sn} (UserInfoStamp=None on next heartbeat)`);
+
+    // Approach 2: DATA QUERY UserInfo command — some firmware versions respond to this
+    // by POSTing their full user list to /iclock/cdata?table=UserInfo
+    const qId = cmdSerial++;
+    cmdOwnership[qId] = { key: sn, isLast: false, ignoreError: true };
+    enqueue(sn, [{ id: qId, cmd: 'DATA QUERY UserInfo' }]);
+
+    logger.info(`ADMS user list request for SN=${sn}: queued UserInfoStamp=None + DATA QUERY UserInfo`);
   });
 }
 
@@ -309,6 +319,75 @@ function startADMSServer(port) {
           return;
         }
 
+        // ── OPERLOG may contain USER records (device response to DATA QUERY UserInfo) ──
+        // This firmware (MB10-VL Ver2.0.14) sends user data inside OPERLOG rather than
+        // table=UserInfo when responding to DATA QUERY UserInfo.
+        if (table === 'OPERLOG' || table === 'operlog') {
+          const userLines = recordLines.filter(l => /^USER[\t ]/.test(l) && l.includes('PIN='));
+          if (userLines.length > 0) {
+            logger.info(`ADMS ${sn} OPERLOG has ${userLines.length} USER records (DATA QUERY response)`);
+
+            if (!deviceUserCache[sn] || !deviceUserCache[sn].collecting) {
+              deviceUserCache[sn] = { employees: [], receivedAt: Date.now(), collecting: true };
+            }
+            const cache = deviceUserCache[sn];
+
+            for (const line of userLines) {
+              const parts = line.split('\t');
+              const kv = {};
+              for (const p of parts.slice(1)) {
+                const idx = p.indexOf('=');
+                if (idx >= 0) kv[p.slice(0, idx)] = p.slice(idx + 1).trim();
+              }
+              // Fallback: space-separated format (some firmware variants)
+              if (!kv.PIN) {
+                const m = line.match(/PIN=(\S+)/);
+                if (m) kv.PIN = m[1];
+                const nm = line.match(/Name=(.+?)\s+(?:Pri|Passwd|Card|Grp|TZ|Verify)=/);
+                if (nm) kv.Name = nm[1].trim();
+                const pm = line.match(/Pri=(\d+)/);
+                if (pm) kv.Pri = pm[1];
+                const pw = line.match(/Passwd=(\S*)/);
+                if (pw) kv.Passwd = pw[1];
+              }
+              const pin = kv.PIN || '';
+              if (!pin || pin === 'PIN') continue;
+              cache.employees.push({
+                uid: parseInt(pin) || 0,
+                employee_id: pin,
+                name: kv.Name || '',
+                privilege: parseInt(kv.Pri || '0') || 0,
+                password: kv.Passwd || '',
+              });
+            }
+
+            logger.info(`ADMS ${sn} total users collected so far: ${cache.employees.length}`);
+
+            // Debounce: if no more USER records arrive in 3s, consider collection complete
+            if (cache.resolveTimer) clearTimeout(cache.resolveTimer);
+            cache.resolveTimer = setTimeout(() => {
+              cache.collecting = false;
+              delete cache.resolveTimer;
+              cache.receivedAt = Date.now();
+
+              const { upsertEmployee, markEmployeesSynced } = require('../store');
+              const valid = cache.employees.filter(e => e.uid > 0);
+              for (const e of valid) upsertEmployee(e);
+              markEmployeesSynced(valid.map(e => String(e.uid)));
+              emit('state_update', { type: 'employees' });
+
+              logger.info(`ADMS ${sn} user collection complete: ${valid.length} users saved from OPERLOG`);
+
+              const pending = pendingUserRequests[sn];
+              if (pending) {
+                clearTimeout(pending.timer);
+                delete pendingUserRequests[sn];
+                pending.resolve({ employees: valid, fromCache: false });
+              }
+            }, 3000);
+          }
+        }
+
         // ── Command ACK (device confirms SET/DELETE completed) ────────
         if (table === 'CMD_ACK' || table === 'cmd_ack' || table === '') {
           const setKey = `set-${sn}`;
@@ -383,18 +462,19 @@ function startADMSServer(port) {
 
         emit('state_update', { type: 'device_update' });
 
-        // If a "load from device" was requested, send the full option block.
-        // UserInfoStamp=None tells the device to push ALL its registered users.
+        // If a "load from device" was requested, send option block with UserInfoStamp=0.
+        // Some firmware responds to 0 but ignores "None"; others need None.
+        // DATA QUERY UserInfo command (queued separately) is a second-attempt trigger.
         if (pendingOptionPush.has(sn)) {
           pendingOptionPush.delete(sn);
-          logger.info(`ADMS sending option block with UserInfoStamp=None to SN=${sn} (load-from-device trigger)`);
+          logger.info(`ADMS sending option block with UserInfoStamp=0 to SN=${sn} (load-from-device trigger)`);
           res.writeHead(200, { 'Content-Type': 'text/plain' });
           res.end(
             `GET OPTION FROM: ${sn}\r\n` +
             `ATTLOGStamp=None\r\n` +
             `OPERLOGStamp=9999\r\n` +
             `ATTPHOTOStamp=None\r\n` +
-            `UserInfoStamp=None\r\n` +
+            `UserInfoStamp=0\r\n` +
             `ErrorDelay=30\r\n` +
             `Delay=10\r\n` +
             `TransTimes=00:00;14:05\r\n` +
@@ -444,6 +524,8 @@ function startADMSServer(port) {
             if (isLast) {
               const p = pendingUserRequests[key];
               if (p) { clearTimeout(p.timer); p.resolve(p.emps || []); delete pendingUserRequests[key]; }
+            } else {
+              logger.info(`ADMS cmd ${cmdId} ACK Return=0 (not last — waiting for device data push)`);
             }
           } else {
             // Fallback: resolve any set/del promise for this SN
