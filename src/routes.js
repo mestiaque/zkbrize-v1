@@ -385,6 +385,7 @@ router.post('/employees', async (req, res) => {
   const emp = req.body;
   if (!emp.uid || !emp.name) return res.status(400).json({ success: false, error: 'uid and name required' });
 
+  const isNew = !store.employees[String(emp.uid)]; // true = first time this UID is added
   upsertEmployee(emp);
 
   const connectedDevices = Object.values(store.devices).filter(d => d.status === 'connected');
@@ -408,7 +409,7 @@ router.post('/employees', async (req, res) => {
 
   // Sync ADMS devices in background
   for (const device of admsDevices) {
-    requestSetUserOnADMS(device.id, emp)
+    requestSetUserOnADMS(device.id, emp, isNew)
       .then(() => logger.info(`ADMS ${device.id}: employee ${emp.uid} synced OK`))
       .catch(e => logger.warn(`ADMS ${device.id}: employee sync failed: ${e.message}`));
   }

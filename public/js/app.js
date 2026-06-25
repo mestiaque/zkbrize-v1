@@ -502,10 +502,21 @@ function renderMachineEmployeeTable() {
 
 function openEmployeeModal(index) {
   const emp = index !== null ? machineEmployees[index] : null;
-  document.getElementById('emp-modal-title').textContent = emp ? 'Edit Employee' : 'Add Employee';
-  document.getElementById('emp-modal-uid-input').value = emp ? emp.uid : '';
-  document.getElementById('emp-modal-uid-input').disabled = !!emp;
-  document.getElementById('emp-modal-empid').value = emp ? (emp.employee_id || emp.employeeId || '') : '';
+  const isEdit = !!emp;
+
+  document.getElementById('emp-modal-title').textContent = isEdit ? 'Edit Employee' : 'Add Employee';
+
+  // Auto-fill UID for new employees
+  const nextUid = isEdit ? emp.uid : (machineEmployees.reduce((max, e) => Math.max(max, e.uid || 0), 0) + 1);
+  document.getElementById('emp-modal-uid-input').value = nextUid;
+  document.getElementById('emp-modal-uid-input').disabled = isEdit; // locked during edit
+
+  // Employee ID: auto-fill from emp or match UID for new
+  document.getElementById('emp-modal-empid').value = isEdit
+    ? (emp.employee_id || emp.employeeId || '')
+    : String(nextUid);
+  document.getElementById('emp-modal-empid').disabled = isEdit; // locked during edit
+
   document.getElementById('emp-modal-name').value = emp ? (emp.name || '') : '';
   document.getElementById('emp-modal-password').value = emp ? (emp.password || '') : '';
   document.getElementById('emp-modal-privilege').value = emp ? (emp.privilege || 0) : 0;

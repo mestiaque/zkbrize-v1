@@ -26,18 +26,24 @@ function clearQueue(sn) {
   delete deviceCommandQueue[sn];
 }
 
-// Build DELETE+INSERT pair per employee (handles both new and existing users)
-function buildUpsertCommands(empsToSync) {
+// Build commands per employee.
+// isNew=true  → DELETE (ignoreError) + INSERT  (new user, no biometrics to preserve)
+// isNew=false → UPDATE only using tablename= form (preserves fingerprint/face on device)
+function buildUpsertCommands(empsToSync, isNew = false) {
   const commands = [];
   for (const e of empsToSync) {
     const pin  = String(e.employee_id || e.employeeId || e.uid || '');
     const name = (e.name || '').slice(0, 24).replace(/[&=\r\n\t]/g, ' ');
     const pri  = e.privilege || 0;
     const pass = e.password || '';
-    // DELETE first (ignore error — user may not exist yet)
-    commands.push({ id: cmdSerial++, cmd: `DATA DELETE UserInfo PIN=${pin}`, ignoreError: true });
-    // INSERT: ZKTeco uses tab as field separator, not &
-    commands.push({ id: cmdSerial++, cmd: `DATA UPDATE UserInfo PIN=${pin}\tName=${name}\tPri=${pri}\tPasswd=${pass}\tCard=0\tGrp=1\tTZ=0000111100000000\tVerify=0\tViceCard=0` });
+    if (isNew) {
+      // DELETE first so a stale entry doesn't block the INSERT
+      commands.push({ id: cmdSerial++, cmd: `DATA DELETE UserInfo PIN=${pin}`, ignoreError: true });
+      commands.push({ id: cmdSerial++, cmd: `DATA UPDATE UserInfo PIN=${pin}\tName=${name}\tPri=${pri}\tPasswd=${pass}\tCard=0\tGrp=1\tTZ=0000111100000000\tVerify=0\tViceCard=0` });
+    } else {
+      // Update name/privilege only — biometrics (fingerprint/face) are untouched
+      commands.push({ id: cmdSerial++, cmd: `DATA UPDATE tablename=UserInfo PIN=${pin}\tName=${name}\tPri=${pri}\tPasswd=${pass}\tCard=0\tGrp=1\tTZ=0000111100000000\tVerify=0\tViceCard=0` });
+    }
   }
   return commands;
 }
@@ -59,14 +65,14 @@ function requestUsersFromADMS(sn) {
   });
 }
 
-function requestSetUserOnADMS(sn, emp) {
+function requestSetUserOnADMS(sn, emp, isNew = false) {
   return new Promise((resolve, reject) => {
-    const allEmps = Object.values(store.employees);
-    const empsToSync = allEmps.length ? allEmps : (emp ? [emp] : []);
+    // Single-employee call: sync just that one employee
+    // Bulk call (emp=null): sync all bridge employees (treat as existing — preserve biometrics)
+    const empsToSync = emp ? [emp] : Object.values(store.employees);
     if (!empsToSync.length) { resolve(true); return; }
 
-    // DELETE then INSERT per user (device DATA UPDATE = INSERT only, fails on existing PIN)
-    const commands = buildUpsertCommands(empsToSync);
+    const commands = buildUpsertCommands(empsToSync, isNew);
 
     const key = `set-${sn}`;
     const lastId = commands[commands.length - 1].id;
