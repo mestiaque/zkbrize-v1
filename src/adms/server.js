@@ -10,14 +10,23 @@ function setSocketIO(socketio) { io = socketio; }
 function emit(event, data) { if (io) io.emit(event, data); }
 
 // ── ADMS Command Queue ─────────────────────────────────────────────
-const deviceCommandQueue = {};   // sn -> { id, cmd }
-const pendingUserRequests = {};  // sn -> { resolve, reject, timer }
-const pendingOptionPush = new Set(); // SNs that need a full option block on next getrequest
+const deviceCommandQueue = {};   // sn -> [{ id, cmd }, ...]  (array, FIFO)
+const cmdOwnership = {};         // cmdId -> { key, isLast } — tracks which promise owns which cmd
+const pendingUserRequests = {};  // key -> { resolve, reject, timer }
+const pendingOptionPush = new Set();
 let cmdSerial = 1;
 
+function enqueue(sn, commands) {
+  if (!deviceCommandQueue[sn]) deviceCommandQueue[sn] = [];
+  deviceCommandQueue[sn].push(...commands);
+}
+
+function clearQueue(sn) {
+  (deviceCommandQueue[sn] || []).forEach(c => delete cmdOwnership[c.id]);
+  delete deviceCommandQueue[sn];
+}
+
 function requestUsersFromADMS(sn) {
-  // Respond to the device's next getrequest with the full option block including UserInfoStamp=None.
-  // Device processes the options and POSTs its user list to /iclock/cdata?table=UserInfo.
   return new Promise((resolve, reject) => {
     const timer = setTimeout(() => {
       delete pendingUserRequests[sn];
@@ -28,60 +37,63 @@ function requestUsersFromADMS(sn) {
     }, 30000);
 
     pendingUserRequests[sn] = { resolve, reject, timer };
-    pendingOptionPush.add(sn); // flag: next getrequest gets full option block
-    delete deviceCommandQueue[sn]; // clear any pending command
+    pendingOptionPush.add(sn);
+    clearQueue(sn);
     logger.info(`ADMS flagged option-push for SN=${sn} — next getrequest will include UserInfoStamp=None`);
   });
 }
 
-function buildUserInfoCmd(employees) {
-  // DATA UPDATE tablename=UserInfo with inline tab-separated rows — no GET needed
-  let cmd = 'DATA UPDATE tablename=UserInfo\r\nPIN\tName\tPri\tPasswd\tCard\tGrpTmp\tTimeZone\tVerify\tViceCard\r\n';
-  for (const e of employees) {
-    const pin  = String(e.employee_id || e.employeeId || e.uid || '');
-    const name = (e.name || '').slice(0, 24).replace(/\t/g, ' ');
-    const pri  = e.privilege || 0;
-    const pass = e.password || '';
-    cmd += `${pin}\t${name}\t${pri}\t${pass}\t0\t1\t0000111100000000\t0\t0\r\n`;
-  }
-  return cmd;
-}
-
 function requestSetUserOnADMS(sn, emp) {
   return new Promise((resolve, reject) => {
-    // Include ALL bridge employees so device user list stays in sync
     const allEmps = Object.values(store.employees);
-    const cmd = buildUserInfoCmd(allEmps.length ? allEmps : [emp]);
+    const empsToSync = allEmps.length ? allEmps : (emp ? [emp] : []);
+    if (!empsToSync.length) { resolve(true); return; }
+
+    // Correct server→device format: DATA SET UserInfo PIN=x&Name=y&...
+    const commands = empsToSync.map(e => {
+      const pin  = String(e.employee_id || e.employeeId || e.uid || '');
+      const name = (e.name || '').slice(0, 24).replace(/[&=\r\n\t]/g, ' ');
+      const pri  = e.privilege || 0;
+      const pass = e.password || '';
+      return {
+        id: cmdSerial++,
+        cmd: `DATA SET UserInfo PIN=${pin}&Name=${name}&Pri=${pri}&Passwd=${pass}&Card=0&Grp=1&TZ=0000111100000000&Verify=0&ViceCard=0`,
+      };
+    });
+
+    const key = `set-${sn}`;
+    const lastId = commands[commands.length - 1].id;
+    commands.forEach(c => { cmdOwnership[c.id] = { key, isLast: c.id === lastId }; });
 
     const timer = setTimeout(() => {
-      delete pendingUserRequests[`set-${sn}`];
-      delete deviceCommandQueue[sn];
+      delete pendingUserRequests[key];
+      commands.forEach(c => delete cmdOwnership[c.id]);
       reject(new Error('Timeout: device did not acknowledge user update.'));
-    }, 20000);
+    }, 20000 + empsToSync.length * 3000);
 
-    pendingUserRequests[`set-${sn}`] = { resolve, reject, timer, type: 'set' };
-    deviceCommandQueue[sn] = { id: cmdSerial++, cmd };
-    logger.info(`ADMS queued DATA UPDATE UserInfo for SN=${sn} (${allEmps.length} employees)`);
+    pendingUserRequests[key] = { resolve, reject, timer, type: 'set' };
+    enqueue(sn, commands);
+    logger.info(`ADMS queued ${commands.length} DATA SET UserInfo for SN=${sn}`);
   });
 }
 
 function requestDeleteUserOnADMS(sn, uid) {
   return new Promise((resolve, reject) => {
-    // After bridge delete, push full remaining employee list to device
-    const allEmps = Object.values(store.employees);
-    const cmd = allEmps.length
-      ? buildUserInfoCmd(allEmps)
-      : `DATA DELETE tablename=UserInfo PIN=${uid}`;
+    const id  = cmdSerial++;
+    const cmd = `DATA DELETE UserInfo PIN=${uid}`;
+    const key = `del-${sn}`;
+
+    cmdOwnership[id] = { key, isLast: true };
 
     const timer = setTimeout(() => {
-      delete pendingUserRequests[`del-${sn}`];
-      delete deviceCommandQueue[sn];
+      delete pendingUserRequests[key];
+      delete cmdOwnership[id];
       reject(new Error('Timeout: device did not acknowledge user delete.'));
     }, 20000);
 
-    pendingUserRequests[`del-${sn}`] = { resolve, reject, timer, type: 'delete' };
-    deviceCommandQueue[sn] = { id: cmdSerial++, cmd };
-    logger.info(`ADMS queued delete/update UserInfo for SN=${sn} UID=${uid}`);
+    pendingUserRequests[key] = { resolve, reject, timer, type: 'delete' };
+    enqueue(sn, [{ id, cmd }]);
+    logger.info(`ADMS queued DATA DELETE UserInfo for SN=${sn} UID=${uid}`);
   });
 }
 
@@ -169,7 +181,7 @@ function startADMSServer(port) {
           res.writeHead(200, { 'Content-Type': 'text/plain' });
           res.end(userBody);
 
-          // Device fetching from us = sync command succeeded — resolve any pending promise
+          // Device fetching users from server — resolve any pending load-from-device promise
           const setP = pendingUserRequests[`set-${sn}`];
           const delP = pendingUserRequests[`del-${sn}`];
           if (setP) { clearTimeout(setP.timer); setP.resolve(true); delete pendingUserRequests[`set-${sn}`]; }
@@ -371,11 +383,12 @@ function startADMSServer(port) {
           return;
         }
 
-        // If there's a pending command for this device, send it now
-        if (deviceCommandQueue[sn]) {
-          const { id, cmd } = deviceCommandQueue[sn];
-          delete deviceCommandQueue[sn];
-          logger.info(`ADMS sending command to SN=${sn}: C:${id}:${cmd}`);
+        // Dequeue and send the next pending command for this device
+        if (deviceCommandQueue[sn] && deviceCommandQueue[sn].length > 0) {
+          const { id, cmd } = deviceCommandQueue[sn].shift();
+          if (deviceCommandQueue[sn].length === 0) delete deviceCommandQueue[sn];
+          const remaining = deviceCommandQueue[sn]?.length || 0;
+          logger.info(`ADMS sending command to SN=${sn} [${remaining} remaining]: C:${id}:${cmd.slice(0,80)}`);
           res.writeHead(200, { 'Content-Type': 'text/plain' });
           res.end(`C:${id}:${cmd}`);
           return;
@@ -392,27 +405,40 @@ function startADMSServer(port) {
         const sn2 = qs2.SN || req.headers['sn'] || 'UNKNOWN';
         const ack = parseKV(body);
         const returnCode = parseInt(ack.Return ?? '0');
-        logger.info(`ADMS devicecmd ACK SN=${sn2} Return=${returnCode} CMD=${ack.CMD || ''}`);
+        // Device sends the command ID back as "ID" field
+        const cmdId = parseInt(ack.ID ?? ack.CmdID ?? '-1');
+        logger.info(`ADMS devicecmd ACK SN=${sn2} Return=${returnCode} ID=${cmdId} CMD=${ack.CMD || ''}`);
 
         if (returnCode === 0) {
-          // Command succeeded — resolve set/delete pending promises
-          const setP = pendingUserRequests[`set-${sn2}`];
-          const delP = pendingUserRequests[`del-${sn2}`];
-          if (setP) { clearTimeout(setP.timer); setP.resolve(true); delete pendingUserRequests[`set-${sn2}`]; }
-          if (delP) { clearTimeout(delP.timer); delP.resolve(true); delete pendingUserRequests[`del-${sn2}`]; }
-        } else if (returnCode < 0) {
-          // Device rejected the command — fail pending promise immediately
-          const pending = pendingUserRequests[sn2];
-          const setP   = pendingUserRequests[`set-${sn2}`];
-          const delP   = pendingUserRequests[`del-${sn2}`];
-          const p = pending || setP || delP;
-          if (p) {
-            clearTimeout(p.timer);
-            if (pending) delete pendingUserRequests[sn2];
-            if (setP)    delete pendingUserRequests[`set-${sn2}`];
-            if (delP)    delete pendingUserRequests[`del-${sn2}`];
-            p.reject(new Error(`Device returned error ${returnCode} — check Logs page for details`));
+          // Resolve by command ID if ownership is tracked
+          if (cmdOwnership[cmdId]) {
+            const { key, isLast } = cmdOwnership[cmdId];
+            delete cmdOwnership[cmdId];
+            if (isLast) {
+              const p = pendingUserRequests[key];
+              if (p) { clearTimeout(p.timer); p.resolve(true); delete pendingUserRequests[key]; }
+            }
+          } else {
+            // Fallback: resolve any set/del promise for this SN
+            const setP = pendingUserRequests[`set-${sn2}`];
+            const delP = pendingUserRequests[`del-${sn2}`];
+            if (setP && !deviceCommandQueue[sn2]?.length) {
+              clearTimeout(setP.timer); setP.resolve(true); delete pendingUserRequests[`set-${sn2}`];
+            }
+            if (delP) { clearTimeout(delP.timer); delP.resolve(true); delete pendingUserRequests[`del-${sn2}`]; }
           }
+        } else if (returnCode < 0) {
+          const key = cmdOwnership[cmdId]?.key;
+          const candidates = key
+            ? [pendingUserRequests[key]]
+            : [pendingUserRequests[`set-${sn2}`], pendingUserRequests[`del-${sn2}`], pendingUserRequests[sn2]];
+          for (const p of candidates) {
+            if (!p) continue;
+            clearTimeout(p.timer);
+            p.reject(new Error(`Device returned error ${returnCode} for command ${cmdId}`));
+          }
+          if (key) delete pendingUserRequests[key];
+          if (cmdId >= 0) delete cmdOwnership[cmdId];
         }
 
         res.writeHead(200, { 'Content-Type': 'text/plain' });
