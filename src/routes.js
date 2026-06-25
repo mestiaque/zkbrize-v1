@@ -5,7 +5,7 @@ const { exec } = require('child_process');
 const { store, getState, clearLogs, upsertEmployee, deleteEmployee, markAttendancePushed, markEmployeesSynced, savePermissions, DEFAULT_PERMISSIONS, saveConfigFile } = require('./store');
 const { testConnection, fetchEmployees, pushAttendance } = require('./laravel/api');
 const { connectTCPDevice, fetchAttendanceFromTCP, disconnectTCPDevice, syncEmployeesToTCP, getEmployeesFromDevice, setEmployeeOnDevice, deleteEmployeeFromDevice } = require('./tcpip/connector');
-const { requestSetUserOnADMS, requestDeleteUserOnADMS, requestUsersFromADMS, pendingOptionPush, restartADMSServer } = require('./adms/server');
+const { requestSetUserOnADMS, requestDeleteUserOnADMS, requestUsersFromADMS, pendingOptionPush, restartADMSServer, deviceUserCache } = require('./adms/server');
 const { runEmployeeSync, runAttendanceFetch, updateSchedule, getSchedulerStatus } = require('./scheduler');
 const logger = require('./logger');
 const fs = require('fs');
@@ -377,19 +377,32 @@ router.get('/employees', (req, res) => {
   res.json({ success: true, employees: Object.values(store.employees), total: Object.keys(store.employees).length });
 });
 
-// Trigger device to push its user list via UserInfoStamp=None in option block
+// Load employees from device (or bridge store if device doesn't push)
 router.post('/employees/load-from-device', async (req, res) => {
   const admsDevices = Object.values(store.devices).filter(d => d.type === 'adms' && d.status === 'connected');
   if (!admsDevices.length) {
-    return res.json({ success: true, employees: Object.values(store.employees), source: 'bridge', warning: 'No ADMS device connected' });
+    const synced = Object.values(store.employees).filter(e => e.syncedToDevice);
+    return res.json({ success: true, employees: synced, source: 'bridge', total: synced.length, warning: 'No ADMS device connected — showing bridge-synced employees' });
   }
+
+  const sn = admsDevices[0].id;
+
   try {
-    const employees = await requestUsersFromADMS(admsDevices[0].id);
-    res.json({ success: true, employees, source: 'device', total: employees.length });
+    const result = await requestUsersFromADMS(sn);
+    const employees = Array.isArray(result) ? result : (result.employees || []);
+    const fromCache = result.fromCache || false;
+    res.json({ success: true, employees, source: 'device', total: employees.length, fromCache });
   } catch (e) {
-    // Device did not respond — return bridge store data with clear warning
-    const fallback = Object.values(store.employees);
-    res.json({ success: true, employees: fallback, source: 'bridge', warning: e.message, total: fallback.length });
+    // Device firmware doesn't push — return employees confirmed synced to this device
+    const synced = Object.values(store.employees).filter(e => e.syncedToDevice);
+    logger.warn(`Load from device failed (${e.message}), returning ${synced.length} bridge-synced employees`);
+    res.json({
+      success: true,
+      employees: synced,
+      source: 'bridge',
+      total: synced.length,
+      warning: `Device did not push user list. Showing ${synced.length} employee(s) confirmed synced to device.`,
+    });
   }
 });
 

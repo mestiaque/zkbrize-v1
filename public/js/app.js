@@ -462,9 +462,14 @@ async function loadBridgeEmployees(fromDevice = false) {
   renderMachineEmployeeTable();
 
   if (fromDevice) {
-    const src = res?.source === 'device' ? 'device' : 'bridge store';
-    if (res?.warning) toast(`Loaded from ${src} (${res.warning})`, 'info');
-    else toast(`${machineEmployees.length} employees loaded from ${src}`, 'success');
+    if (res?.source === 'device') {
+      const note = res?.fromCache ? ' (cached from last device push)' : '';
+      toast(`${machineEmployees.length} employees loaded from device${note}`, 'success');
+    } else if (res?.warning) {
+      toast(res.warning, 'info');
+    } else {
+      toast(`${machineEmployees.length} employees loaded from bridge store`, 'info');
+    }
   }
 }
 

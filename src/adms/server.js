@@ -14,6 +14,7 @@ const deviceCommandQueue = {};   // sn -> [{ id, cmd }, ...]  (array, FIFO)
 const cmdOwnership = {};         // cmdId -> { key, isLast } — tracks which promise owns which cmd
 const pendingUserRequests = {};  // key -> { resolve, reject, timer }
 const pendingOptionPush = new Set();
+const deviceUserCache = {};      // sn -> { employees, receivedAt } — last push from device
 let cmdSerial = 1;
 
 function enqueue(sn, commands) {
@@ -49,17 +50,28 @@ function buildUpsertCommands(empsToSync, isNew = false) {
 }
 
 function requestUsersFromADMS(sn) {
+  // If device already pushed its user list (cache hit within last 2 hours), return immediately
+  const cache = deviceUserCache[sn];
+  if (cache && cache.employees.length > 0) {
+    const ageMin = (Date.now() - cache.receivedAt) / 60000;
+    logger.info(`ADMS returning cached user list for SN=${sn} (${cache.employees.length} users, ${Math.round(ageMin)}min ago)`);
+    // Trigger background refresh for next time
+    pendingOptionPush.add(sn);
+    return Promise.resolve({ employees: cache.employees, fromCache: true });
+  }
+
+  // No cache — wait for device to push via UserInfoStamp=None
   return new Promise((resolve, reject) => {
     const timer = setTimeout(() => {
       delete pendingUserRequests[sn];
       pendingOptionPush.delete(sn);
-      reject(new Error('Device did not respond within 30s. Make sure device is connected and try again.'));
+      reject(new Error('Device did not push user list. This firmware may not support automatic user sync. Try reconnecting the device.'));
     }, 30000);
 
     pendingUserRequests[sn] = { resolve, reject, timer };
     pendingOptionPush.add(sn);
     clearQueue(sn);
-    logger.info(`ADMS flagged option-push for SN=${sn} — next getrequest will include UserInfoStamp=None`);
+    logger.info(`ADMS waiting for user list from SN=${sn} (UserInfoStamp=None on next heartbeat)`);
   });
 }
 
@@ -277,17 +289,19 @@ function startADMSServer(port) {
           }
 
           logger.info(`ADMS ${sn} saved ${parsed.length} employees from device push`);
-          // These employees exist on the device — mark them as synced
+          // Cache the device's user list for Load from Machine
+          deviceUserCache[sn] = { employees: parsed, receivedAt: Date.now() };
+          // Mark them as synced (they exist on the device)
           const { markEmployeesSynced } = require('../store');
           markEmployeesSynced(parsed.map(e => String(e.uid)));
           emit('state_update', { type: 'employees' });
 
-          // Also resolve any pending requestUsersFromADMS promise
+          // Resolve any pending requestUsersFromADMS promise
           const pending = pendingUserRequests[sn];
           if (pending) {
             clearTimeout(pending.timer);
             delete pendingUserRequests[sn];
-            pending.resolve(parsed);
+            pending.resolve({ employees: parsed, fromCache: false });
           }
 
           res.writeHead(200, { 'Content-Type': 'text/plain' });
@@ -499,4 +513,4 @@ function restartADMSServer(newPort) {
   });
 }
 
-module.exports = { startADMSServer, restartADMSServer, setSocketIO, requestUsersFromADMS, requestSetUserOnADMS, requestDeleteUserOnADMS, pendingOptionPush };
+module.exports = { startADMSServer, restartADMSServer, setSocketIO, requestUsersFromADMS, requestSetUserOnADMS, requestDeleteUserOnADMS, pendingOptionPush, deviceUserCache };
