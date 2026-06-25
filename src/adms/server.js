@@ -49,7 +49,8 @@ function requestSetUserOnADMS(sn, emp) {
     const empsToSync = allEmps.length ? allEmps : (emp ? [emp] : []);
     if (!empsToSync.length) { resolve(true); return; }
 
-    // Correct server→device format: DATA SET UserInfo PIN=x&Name=y&...
+    // Correct server→device format: DATA UPDATE tablename=UserInfo PIN=x&Name=y&...
+    // (not tab-separated — that is device→server direction only)
     const commands = empsToSync.map(e => {
       const pin  = String(e.employee_id || e.employeeId || e.uid || '');
       const name = (e.name || '').slice(0, 24).replace(/[&=\r\n\t]/g, ' ');
@@ -57,7 +58,7 @@ function requestSetUserOnADMS(sn, emp) {
       const pass = e.password || '';
       return {
         id: cmdSerial++,
-        cmd: `DATA SET UserInfo PIN=${pin}&Name=${name}&Pri=${pri}&Passwd=${pass}&Card=0&Grp=1&TZ=0000111100000000&Verify=0&ViceCard=0`,
+        cmd: `DATA UPDATE tablename=UserInfo PIN=${pin}&Name=${name}&Pri=${pri}&Passwd=${pass}&Card=0&Grp=1&TZ=0000111100000000&Verify=0&ViceCard=0`,
       };
     });
 
