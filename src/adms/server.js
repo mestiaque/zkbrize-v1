@@ -26,6 +26,22 @@ function clearQueue(sn) {
   delete deviceCommandQueue[sn];
 }
 
+// Build DELETE+INSERT pair per employee (handles both new and existing users)
+function buildUpsertCommands(empsToSync) {
+  const commands = [];
+  for (const e of empsToSync) {
+    const pin  = String(e.employee_id || e.employeeId || e.uid || '');
+    const name = (e.name || '').slice(0, 24).replace(/[&=\r\n\t]/g, ' ');
+    const pri  = e.privilege || 0;
+    const pass = e.password || '';
+    // DELETE first (ignore error — user may not exist yet)
+    commands.push({ id: cmdSerial++, cmd: `DATA DELETE UserInfo PIN=${pin}`, ignoreError: true });
+    // INSERT after delete
+    commands.push({ id: cmdSerial++, cmd: `DATA UPDATE tablename=UserInfo PIN=${pin}&Name=${name}&Pri=${pri}&Passwd=${pass}&Card=0&Grp=1&TZ=0000111100000000&Verify=0&ViceCard=0` });
+  }
+  return commands;
+}
+
 function requestUsersFromADMS(sn) {
   return new Promise((resolve, reject) => {
     const timer = setTimeout(() => {
@@ -49,21 +65,12 @@ function requestSetUserOnADMS(sn, emp) {
     const empsToSync = allEmps.length ? allEmps : (emp ? [emp] : []);
     if (!empsToSync.length) { resolve(true); return; }
 
-    // Server→device: DATA SET (insert/update) using field names the device itself sends
-    const commands = empsToSync.map(e => {
-      const pin  = String(e.employee_id || e.employeeId || e.uid || '');
-      const name = (e.name || '').slice(0, 24).replace(/[&=\r\n\t]/g, ' ');
-      const pri  = e.privilege || 0;
-      const pass = e.password || '';
-      return {
-        id: cmdSerial++,
-        cmd: `DATA SET UserInfo PIN=${pin}&Name=${name}&Pri=${pri}&Passwd=${pass}&Card=0&GrpTmp=1&TimeZone=0000111100000000&Verify=0&ViceCard=0`,
-      };
-    });
+    // DELETE then INSERT per user (device DATA UPDATE = INSERT only, fails on existing PIN)
+    const commands = buildUpsertCommands(empsToSync);
 
     const key = `set-${sn}`;
     const lastId = commands[commands.length - 1].id;
-    commands.forEach(c => { cmdOwnership[c.id] = { key, isLast: c.id === lastId }; });
+    commands.forEach(c => { cmdOwnership[c.id] = { key, isLast: c.id === lastId, ignoreError: c.ignoreError || false }; });
 
     const timer = setTimeout(() => {
       delete pendingUserRequests[key];
@@ -428,17 +435,24 @@ function startADMSServer(port) {
             if (delP) { clearTimeout(delP.timer); delP.resolve(true); delete pendingUserRequests[`del-${sn2}`]; }
           }
         } else if (returnCode < 0) {
-          const key = cmdOwnership[cmdId]?.key;
-          const candidates = key
-            ? [pendingUserRequests[key]]
-            : [pendingUserRequests[`set-${sn2}`], pendingUserRequests[`del-${sn2}`], pendingUserRequests[sn2]];
-          for (const p of candidates) {
-            if (!p) continue;
-            clearTimeout(p.timer);
-            p.reject(new Error(`Device returned error ${returnCode} for command ${cmdId}`));
+          const ownership = cmdOwnership[cmdId];
+          if (ownership?.ignoreError) {
+            // Expected failure (e.g. DELETE of non-existent user) — just continue
+            logger.info(`ADMS cmd ${cmdId} failed with ${returnCode} (ignored — continuing queue)`);
+            delete cmdOwnership[cmdId];
+          } else {
+            const key = ownership?.key;
+            const candidates = key
+              ? [pendingUserRequests[key]]
+              : [pendingUserRequests[`set-${sn2}`], pendingUserRequests[`del-${sn2}`], pendingUserRequests[sn2]];
+            for (const p of candidates) {
+              if (!p) continue;
+              clearTimeout(p.timer);
+              p.reject(new Error(`Device returned error ${returnCode} for command ${cmdId}`));
+            }
+            if (key) delete pendingUserRequests[key];
+            if (cmdId >= 0) delete cmdOwnership[cmdId];
           }
-          if (key) delete pendingUserRequests[key];
-          if (cmdId >= 0) delete cmdOwnership[cmdId];
         }
 
         res.writeHead(200, { 'Content-Type': 'text/plain' });
