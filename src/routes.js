@@ -133,13 +133,30 @@ router.post('/laravel/set-employees', async (req, res) => {
 
   if (targets.length === 0) return res.json({ success: false, error: 'No connected devices found' });
 
+  // Import fetched employees into bridge store so ADMS can pick them up
+  for (const emp of empResult.employees) {
+    const uid = parseInt(emp.uid || emp.id || emp.employee_id || emp.pin || 0);
+    if (!uid) continue;
+    upsertEmployee({
+      uid,
+      employee_id: String(emp.employee_id || emp.pin || emp.card_no || uid),
+      name: emp.name || (emp.first_name ? emp.first_name + (emp.last_name ? ' ' + emp.last_name : '') : '') || '',
+      password: emp.password || '',
+      privilege: parseInt(emp.privilege || 0) || 0,
+    });
+  }
+
   const results = [];
   for (const d of targets) {
     if (d.type === 'tcp') {
       const r = await syncEmployeesToTCP(d.id, empResult.employees);
       results.push({ deviceId: d.id, ...r });
-    } else {
-      results.push({ deviceId: d.id, success: false, error: 'ADMS employee push not supported' });
+    } else if (d.type === 'adms') {
+      // Queue DATA UPDATE command — device receives it on next heartbeat
+      requestSetUserOnADMS(d.id, null)
+        .then(() => logger.info(`ADMS ${d.id}: bulk employee sync OK`))
+        .catch(e => logger.warn(`ADMS ${d.id}: bulk employee sync failed: ${e.message}`));
+      results.push({ deviceId: d.id, success: true, queued: true, count: empResult.employees.length });
     }
   }
   res.json({ success: true, results, total: empResult.employees.length });
@@ -411,7 +428,28 @@ router.post('/devices/:deviceId/sync-employees', async (req, res) => {
     const result = await syncEmployeesToTCP(deviceId, empResult.employees);
     return res.json(result);
   }
-  res.json({ success: false, error: 'ADMS employee sync not yet implemented' });
+
+  if (device.type === 'adms') {
+    // Import fetched employees into bridge store first
+    for (const emp of empResult.employees) {
+      const uid = parseInt(emp.uid || emp.id || emp.employee_id || emp.pin || 0);
+      if (!uid) continue;
+      upsertEmployee({
+        uid,
+        employee_id: String(emp.employee_id || emp.pin || emp.card_no || uid),
+        name: emp.name || (emp.first_name ? emp.first_name + (emp.last_name ? ' ' + emp.last_name : '') : '') || '',
+        password: emp.password || '',
+        privilege: parseInt(emp.privilege || 0) || 0,
+      });
+    }
+    // Queue the sync — device picks it up on next heartbeat (within ~30s)
+    requestSetUserOnADMS(deviceId, null)
+      .then(() => logger.info(`ADMS ${deviceId}: sync-employees OK`))
+      .catch(e => logger.warn(`ADMS ${deviceId}: sync-employees failed: ${e.message}`));
+    return res.json({ success: true, queued: true, count: empResult.employees.length, message: 'Sync queued — device will update on next heartbeat' });
+  }
+
+  res.json({ success: false, error: 'Unknown device type' });
 });
 
 // ── Attendance Logs ────────────────────────────────────────────────
