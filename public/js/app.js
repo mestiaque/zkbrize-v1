@@ -359,26 +359,48 @@ async function fetchEmployeesFromApi() {
 }
 
 async function setEmployeesToDevice() {
-  if (!fetchedEmployees.length) { toast('Fetch employees first', 'error'); return; }
   const statusEl = document.getElementById('employee-sync-status');
   const btn = document.getElementById('set-emp-btn');
+
+  // Use bridge employees if available; fall back to fetched-from-API employees
+  const hasBridge = machineEmployees && machineEmployees.length > 0;
+  const hasFetched = fetchedEmployees && fetchedEmployees.length > 0;
+
+  if (!hasBridge && !hasFetched) {
+    toast('No employees to push. Add employees or load from ERP first.', 'error');
+    return;
+  }
+
   btn.disabled = true;
   btn.textContent = 'Pushing to device...';
   statusEl.innerHTML = '<div class="hint">Pushing employees to connected devices...</div>';
 
-  const res = await api('/laravel/set-employees', {});
+  let res;
+  if (hasBridge) {
+    // Push bridge store employees directly — no Laravel fetch needed
+    res = await api('/employees/push-to-devices', {});
+  } else {
+    // Fallback: fetch from Laravel then push
+    res = await api('/laravel/set-employees', {});
+  }
+
   btn.disabled = false;
   btn.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V6h16v12zM6 10h2v2H6zm0 4h8v2H6zm10 0h2v2h-2zm-6-4h8v2h-8z"/></svg> Set to Device';
 
   if (res?.success) {
     const lines = (res.results || []).map(r =>
       `<div style="font-size:13px;margin-top:4px">
-        <strong>${r.deviceId}</strong>: ${r.success ? `<span style="color:var(--green)">✓ ${r.synced ?? ''} synced</span>` : `<span style="color:var(--red)">✗ ${r.error}</span>`}
+        <strong>${r.deviceId?.slice(-8) || r.deviceId}</strong>:
+        ${r.queued
+          ? `<span style="color:var(--green)">✓ Queued (ADMS — syncs within 30s)</span>`
+          : r.success
+            ? `<span style="color:var(--green)">✓ Synced</span>`
+            : `<span style="color:var(--red)">✗ ${r.error || 'Failed'}</span>`}
       </div>`).join('');
-    statusEl.innerHTML = `<div class="badge-green" style="margin-bottom:8px">${res.total} employees pushed</div>${lines}`;
-    toast(`Employees set to device`, 'success');
+    statusEl.innerHTML = `<div class="badge-green" style="margin-bottom:8px">${res.total} employees pushed to ${(res.results||[]).length} device(s)</div>${lines}`;
+    toast(`${res.total} employees pushed to device(s)`, 'success');
   } else {
-    statusEl.innerHTML = `<div style="color:var(--red)">${res?.error || 'Failed to set employees'}</div>`;
+    statusEl.innerHTML = `<div style="color:var(--red)">${res?.error || 'Failed to push employees'}</div>`;
     toast(res?.error || 'Failed', 'error');
   }
 }

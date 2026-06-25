@@ -272,6 +272,34 @@ router.post('/devices/:deviceId/fetch-attendance', async (req, res) => {
   res.json({ success: false, error: 'ADMS devices push automatically' });
 });
 
+// ── Push bridge employees to all ADMS/TCP devices ──────────────
+// No Laravel fetch needed — uses whatever is already in bridge store
+router.post('/employees/push-to-devices', async (req, res) => {
+  const allEmps = Object.values(store.employees);
+  if (!allEmps.length) return res.json({ success: false, error: 'No employees in bridge store. Add employees first.' });
+
+  const connected = Object.values(store.devices).filter(d => d.status === 'connected');
+  if (!connected.length) return res.json({ success: false, error: 'No connected devices found.' });
+
+  const results = [];
+  for (const d of connected) {
+    if (d.type === 'adms') {
+      requestSetUserOnADMS(d.id, null)
+        .then(() => logger.info(`ADMS ${d.id}: push-to-devices OK`))
+        .catch(e => logger.warn(`ADMS ${d.id}: push-to-devices failed: ${e.message}`));
+      results.push({ deviceId: d.id, type: 'adms', queued: true });
+    } else if (d.type === 'tcp') {
+      try {
+        const r = await syncEmployeesToTCP(d.id, allEmps);
+        results.push({ deviceId: d.id, type: 'tcp', ...r });
+      } catch (e) {
+        results.push({ deviceId: d.id, type: 'tcp', success: false, error: e.message });
+      }
+    }
+  }
+  res.json({ success: true, total: allEmps.length, results });
+});
+
 // ── ERP → Bridge import ────────────────────────────────────────
 // Fetch employees from ERP and save them all to bridge store
 router.post('/employees/import-from-laravel', async (req, res) => {
