@@ -478,23 +478,30 @@ function renderMachineEmployeeTable() {
     <div class="table-wrap">
       <table class="data-table">
         <thead><tr>
-          <th>#</th><th>UID</th><th>Employee ID</th><th>Name</th><th>Role</th><th>Actions</th>
+          <th>#</th><th>UID</th><th>Employee ID</th><th>Name</th><th>Role</th><th>Device Sync</th><th>Actions</th>
         </tr></thead>
         <tbody>
-          ${machineEmployees.map((e, i) => `
+          ${machineEmployees.map((e, i) => {
+            const synced = e.syncedToDevice;
+            const syncBadge = synced
+              ? `<span class="tag tag-green" title="Synced at ${e.syncedAt ? new Date(e.syncedAt).toLocaleString() : ''}">✓ Synced</span>`
+              : `<span class="tag tag-amber">⚠ Not Synced</span>`;
+            return `
             <tr>
               <td style="color:var(--text-3)">${i + 1}</td>
               <td style="font-family:monospace">${e.uid}</td>
               <td><strong>${e.employee_id || e.employeeId || '—'}</strong></td>
               <td>${e.name || '—'}</td>
               <td><span class="tag ${e.privilege === 14 ? 'tag-amber' : ''}">${e.privilege === 14 ? 'Admin' : 'User'}</span></td>
+              <td>${syncBadge}</td>
               <td>
                 <div class="device-actions">
                   <button class="btn-sm" onclick="openEmployeeModal(${i})">Edit</button>
                   <button class="btn-sm" style="color:var(--red)" onclick="deleteBridgeEmployee(${e.uid})">Delete</button>
                 </div>
               </td>
-            </tr>`).join('')}
+            </tr>`;
+          }).join('')}
         </tbody>
       </table>
     </div>`;

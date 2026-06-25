@@ -53,9 +53,7 @@ function requestUsersFromADMS(sn) {
     const timer = setTimeout(() => {
       delete pendingUserRequests[sn];
       pendingOptionPush.delete(sn);
-      const existing = Object.values(store.employees);
-      if (existing.length) resolve(existing);
-      else reject(new Error('Device did not send user data within 30s. Try clicking "Load from Machine" again.'));
+      reject(new Error('Device did not respond within 30s. Make sure device is connected and try again.'));
     }, 30000);
 
     pendingUserRequests[sn] = { resolve, reject, timer };
@@ -65,12 +63,11 @@ function requestUsersFromADMS(sn) {
   });
 }
 
-function requestSetUserOnADMS(sn, emp, isNew = false) {
+// empList: explicit list override (used by push-to-devices for filtered unsynced employees)
+function requestSetUserOnADMS(sn, emp, isNew = false, empList = null) {
   return new Promise((resolve, reject) => {
-    // Single-employee call: sync just that one employee
-    // Bulk call (emp=null): sync all bridge employees (treat as existing — preserve biometrics)
-    const empsToSync = emp ? [emp] : Object.values(store.employees);
-    if (!empsToSync.length) { resolve(true); return; }
+    const empsToSync = empList || (emp ? [emp] : Object.values(store.employees));
+    if (!empsToSync.length) { resolve([]); return; }
 
     const commands = buildUpsertCommands(empsToSync, isNew);
 
@@ -84,9 +81,9 @@ function requestSetUserOnADMS(sn, emp, isNew = false) {
       reject(new Error('Timeout: device did not acknowledge user update.'));
     }, 20000 + empsToSync.length * 3000);
 
-    pendingUserRequests[key] = { resolve, reject, timer, type: 'set' };
+    pendingUserRequests[key] = { resolve, reject, timer, type: 'set', emps: empsToSync };
     enqueue(sn, commands);
-    logger.info(`ADMS queued ${commands.length} DATA SET UserInfo for SN=${sn}`);
+    logger.info(`ADMS queued ${commands.length} commands for ${empsToSync.length} employee(s) SN=${sn}`);
   });
 }
 
@@ -280,6 +277,9 @@ function startADMSServer(port) {
           }
 
           logger.info(`ADMS ${sn} saved ${parsed.length} employees from device push`);
+          // These employees exist on the device — mark them as synced
+          const { markEmployeesSynced } = require('../store');
+          markEmployeesSynced(parsed.map(e => String(e.uid)));
           emit('state_update', { type: 'employees' });
 
           // Also resolve any pending requestUsersFromADMS promise
@@ -429,7 +429,7 @@ function startADMSServer(port) {
             delete cmdOwnership[cmdId];
             if (isLast) {
               const p = pendingUserRequests[key];
-              if (p) { clearTimeout(p.timer); p.resolve(true); delete pendingUserRequests[key]; }
+              if (p) { clearTimeout(p.timer); p.resolve(p.emps || []); delete pendingUserRequests[key]; }
             }
           } else {
             // Fallback: resolve any set/del promise for this SN

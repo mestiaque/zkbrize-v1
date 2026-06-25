@@ -171,8 +171,30 @@ function addSyncLog(entry) {
 
 function upsertEmployee(emp) {
   const key = String(emp.uid);
-  store.employees[key] = { ...emp, updatedAt: new Date().toISOString() };
+  const existing = store.employees[key];
+  store.employees[key] = {
+    ...emp,
+    // Preserve sync status across edits — only new employees start as unsynced
+    syncedToDevice: existing?.syncedToDevice ?? false,
+    syncedAt:       existing?.syncedAt       ?? null,
+    createdAt:      existing?.createdAt      ?? new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  };
   saveEmployeeFile(store.employees);
+}
+
+function markEmployeesSynced(uids) {
+  const now = new Date().toISOString();
+  let changed = false;
+  uids.forEach(uid => {
+    const key = String(uid);
+    if (store.employees[key]) {
+      store.employees[key].syncedToDevice = true;
+      store.employees[key].syncedAt = now;
+      changed = true;
+    }
+  });
+  if (changed) saveEmployeeFile(store.employees);
 }
 
 function deleteEmployee(uid) {
@@ -238,6 +260,7 @@ module.exports = {
   upsertEmployee,
   deleteEmployee,
   markAttendancePushed,
+  markEmployeesSynced,
   clearLogs,
   getState,
   savePermissions,
