@@ -36,8 +36,8 @@ function buildUpsertCommands(empsToSync) {
     const pass = e.password || '';
     // DELETE first (ignore error — user may not exist yet)
     commands.push({ id: cmdSerial++, cmd: `DATA DELETE UserInfo PIN=${pin}`, ignoreError: true });
-    // INSERT after delete
-    commands.push({ id: cmdSerial++, cmd: `DATA UPDATE tablename=UserInfo PIN=${pin}&Name=${name}&Pri=${pri}&Passwd=${pass}&Card=0&Grp=1&TZ=0000111100000000&Verify=0&ViceCard=0` });
+    // INSERT: match DELETE syntax pattern (no tablename= prefix)
+    commands.push({ id: cmdSerial++, cmd: `DATA UPDATE UserInfo PIN=${pin}&Name=${name}&Pri=${pri}&Passwd=${pass}&Card=0&Grp=1&TZ=0000111100000000&Verify=0&ViceCard=0` });
   }
   return commands;
 }
