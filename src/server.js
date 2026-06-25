@@ -77,7 +77,7 @@ logger.info(`ADMS server started on port ${store.config.admsPort}`);
 startScheduler();
 
 server.listen(PORT, '0.0.0.0', () => {
-  logger.info(`ZK-Laravel Bridge running at http://localhost:${PORT}`);
+  logger.info(`ZK-ERP Bridge running at http://localhost:${PORT}`);
   logger.info(`ADMS listener on port ${store.config.admsPort}`);
 });
 

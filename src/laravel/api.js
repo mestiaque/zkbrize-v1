@@ -37,7 +37,7 @@ async function fetchEmployees() {
     logger.info(`Fetching employees from: ${url}`);
     const res = await axios.get(url, { headers: makeHeaders(), timeout: 15000 });
     const employees = res.data?.data || res.data || [];
-    logger.info(`Fetched ${employees.length} employees from Laravel`);
+    logger.info(`Fetched ${employees.length} employees from ERP`);
     addSyncLog({
       type: 'employee_fetch',
       status: 'success',
@@ -60,7 +60,7 @@ async function pushAttendance(records) {
     logger.info(`Pushing ${records.length} records to: ${url}`);
     const res = await axios.post(url, { records }, { headers: makeHeaders(), timeout: 15000 });
     const count = res.data?.saved || res.data?.count || records.length;
-    logger.info(`Pushed ${count} attendance records to Laravel`);
+    logger.info(`Pushed ${count} attendance records to ERP`);
     addSyncLog({
       type: 'attendance_push',
       status: 'success',

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ZKTeco ↔ Laravel Bridge</title>
+<title>ZKTeco ↔ ERP Bridge</title>
 <script src="https://cdn.socket.io/4.6.0/socket.io.min.js"></script>
 <link rel="stylesheet" href="css/style.css">
 </head>
@@ -16,7 +16,7 @@
       <div class="brand-icon">ZK</div>
       <div>
         <div class="brand-name">ZK Bridge</div>
-        <div class="brand-sub">Laravel Connector</div>
+        <div class="brand-sub">ERP Connector</div>
       </div>
     </div>
 
@@ -77,7 +77,7 @@
     <div class="sidebar-status">
       <div class="status-row">
         <span class="status-dot" id="status-laravel"></span>
-        <span>Laravel API</span>
+        <span>ERP API</span>
       </div>
       <div class="status-row">
         <span class="status-dot" id="status-adms"></span>
@@ -270,9 +270,9 @@
           <p class="sub">Manage employees, sync with devices, and export for ZKTeco software</p>
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <button class="btn btn-primary" id="import-laravel-btn" onclick="importFromLaravel()">
+          <button class="btn btn-primary" id="import-laravel-btn" onclick="importFromERP()">
             <svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M19 9h-4V3H9v6H5l7 7 7-7zm-8 2V5h2v6h1.17L12 13.17 9.83 11H11zm-6 7h14v2H5z"/></svg>
-            Load from Laravel
+            Load from ERP
           </button>
           <button class="btn" id="load-machine-emp-btn" onclick="showLoadFromMachineModal()">
             <svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-8 2.5c1.24 0 2.25 1.01 2.25 2.25S13.24 11 12 11s-2.25-1.01-2.25-2.25S10.76 6.5 12 6.5zM17 17H7v-1.29c0-1.52 3.14-2.21 5-2.21s5 .69 5 2.21V17z"/></svg>
@@ -302,7 +302,7 @@
           </div>
         </div>
         <div id="employee-table-wrap">
-          <div class="empty-state">Click "Load from Laravel" or "Load from Machine" to load employees</div>
+          <div class="empty-state">Click "Load from ERP" or "Load from Machine" to load employees</div>
         </div>
         <div id="employee-sync-status" class="mt"></div>
       </div>
@@ -318,7 +318,7 @@
 
       <div class="card mt" id="card-api-docs">
         <div class="card-header">
-          <div class="card-title">Laravel API Endpoints Required</div>
+          <div class="card-title">ERP API Endpoints Required</div>
         </div>
         <div class="code-block">
 <pre>// routes/api.php
@@ -367,7 +367,7 @@ Route::middleware('auth:sanctum')->prefix('zk')->group(function() {
         </div>
         <div style="display:flex;gap:8px">
           <button class="btn" id="btn-fetch-attendance" onclick="fetchAttendance()">Fetch from Devices</button>
-          <button class="btn btn-primary" id="btn-push-laravel" onclick="pushToLaravel()">Push to Laravel</button>
+          <button class="btn btn-primary" id="btn-push-laravel" onclick="pushToERP()">Push to ERP</button>
         </div>
       </div>
 
@@ -446,21 +446,21 @@ Route::middleware('auth:sanctum')->prefix('zk')->group(function() {
     <!-- Settings Page -->
     <div id="page-settings" class="page">
       <div class="section-header">
-        <div><h2>Settings</h2><p class="sub">Configure Laravel connection and sync schedules</p></div>
+        <div><h2>Settings</h2><p class="sub">Configure ERP connection and sync schedules</p></div>
       </div>
 
       <div class="two-col">
         <div class="card">
-          <div class="card-header"><div class="card-title">Laravel API Configuration</div></div>
+          <div class="card-header"><div class="card-title">ERP API Configuration</div></div>
           <div class="form-group">
-            <label>Laravel API Base URL</label>
+            <label>ERP API Base URL</label>
             <input type="url" id="set-laravel-url" placeholder="https://yourapp.com/api">
             <span class="field-hint">Include /api — e.g. https://myapp.com/api</span>
           </div>
           <div class="form-group">
             <label>API Token (Bearer) <span style="color:var(--text-3);font-weight:400">— optional</span></label>
             <input type="password" id="set-laravel-token" placeholder="Leave empty if not required">
-            <span class="field-hint">Laravel Sanctum / Passport token (leave blank if public route)</span>
+            <span class="field-hint">ERP Sanctum / Passport token (leave blank if public route)</span>
           </div>
           <div class="form-group">
             <label>Fetch Employee URL</label>
@@ -474,7 +474,7 @@ Route::middleware('auth:sanctum')->prefix('zk')->group(function() {
           </div>
           <div style="display:flex;gap:8px">
             <button class="btn btn-primary" onclick="saveConfig()">Save Config</button>
-            <button class="btn" onclick="testLaravel()">Test Connection</button>
+            <button class="btn" onclick="testERP()">Test Connection</button>
           </div>
           <div id="laravel-test-result" class="mt"></div>
         </div>
@@ -486,7 +486,7 @@ Route::middleware('auth:sanctum')->prefix('zk')->group(function() {
           <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 0 10px">
             <div>
               <div style="font-size:13px;font-weight:600">Employee Sync</div>
-              <div class="field-hint" id="emp-sync-status-text">Syncs employees from Laravel to devices</div>
+              <div class="field-hint" id="emp-sync-status-text">Syncs employees from ERP to devices</div>
             </div>
             <label class="toggle-switch">
               <input type="checkbox" id="toggle-employee-sync" onchange="toggleSync('employee')">
@@ -505,7 +505,7 @@ Route::middleware('auth:sanctum')->prefix('zk')->group(function() {
           <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 0 10px">
             <div>
               <div style="font-size:13px;font-weight:600">Attendance Push</div>
-              <div class="field-hint" id="att-sync-status-text">Pushes new attendance records to Laravel automatically</div>
+              <div class="field-hint" id="att-sync-status-text">Pushes new attendance records to ERP automatically</div>
             </div>
             <label class="toggle-switch">
               <input type="checkbox" id="toggle-attendance-sync" onchange="toggleSync('attendance')">
@@ -515,7 +515,7 @@ Route::middleware('auth:sanctum')->prefix('zk')->group(function() {
           <div class="form-group" id="att-sync-fields">
             <label>Attendance Push (Cron)</label>
             <input type="text" id="set-fetch-schedule" placeholder="*/15 * * * *">
-            <span class="field-hint">e.g. */15 * * * * = every 15 minutes — pushes unpushed records to Laravel</span>
+            <span class="field-hint">e.g. */15 * * * * = every 15 minutes — pushes unpushed records to ERP</span>
           </div>
 
           <div class="schedule-presets">
@@ -581,7 +581,7 @@ Route::middleware('auth:sanctum')->prefix('zk')->group(function() {
           <a class="guide-toc-item" href="#g-network">Network Setup</a>
           <a class="guide-toc-item" href="#g-server">Server Settings</a>
           <a class="guide-toc-item" href="#g-api">API Reference</a>
-          <a class="guide-toc-item" href="#g-laravel">Laravel Example</a>
+          <a class="guide-toc-item" href="#g-laravel">ERP Example</a>
           <a class="guide-toc-item" href="#g-trouble">Troubleshooting</a>
         </div>
 
@@ -750,10 +750,10 @@ LARAVEL_API_TOKEN=your-token-here</pre></div>
             <div class="code-block"><pre>{ "success": true, "saved": 1 }</pre></div>
           </div>
 
-          <!-- Laravel Example -->
+          <!-- ERP Example -->
           <div class="guide-section" id="g-laravel">
             <div class="guide-section-title">
-              <span class="guide-num">6</span> Laravel Controller Example
+              <span class="guide-num">6</span> ERP Controller Example
             </div>
             <div class="code-block"><pre>// routes/api.php
 Route::get('/fetch-employee',   [ZKController::class, 'fetchEmployee']);
@@ -796,8 +796,8 @@ public function syncAttendance(Request $request)
                 <tr><td>Device not showing in Devices page</td><td>Check Server Address & Port on device. Ping test karon. Ensure same subnet.</td></tr>
                 <tr><td>Attendance showing Device: UNKNOWN</td><td>Server restart diye abar finger din. Check Logs page for RAW POST line.</td></tr>
                 <tr><td>Ping test fails</td><td>Device & server different subnet-e. Device IP change kore server-er subnet-e ano.</td></tr>
-                <tr><td>Laravel test fails</td><td>API URL check karon — sheshe <code>/api</code> ache kina. Token sothik ache kina.</td></tr>
-                <tr><td>Attendance not pushing to Laravel</td><td>Sync Attendance URL set ache kina Settings-e check karon. Logs-e error dekhan.</td></tr>
+                <tr><td>ERP test fails</td><td>API URL check karon — sheshe <code>/api</code> ache kina. Token sothik ache kina.</td></tr>
+                <tr><td>Attendance not pushing to ERP</td><td>Sync Attendance URL set ache kina Settings-e check karon. Logs-e error dekhan.</td></tr>
                 <tr><td>ADMS not connecting</td><td>Device-e HTTPS must be OFF. Port 5015. Server firewall port 5015 open ache kina.</td></tr>
                 <tr><td>Employee fetch fails</td><td>Fetch Employee URL set ache kina. API response format check karon — <code>data</code> array dorkar.</td></tr>
               </tbody>

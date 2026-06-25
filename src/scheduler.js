@@ -17,7 +17,7 @@ async function runEmployeeSync() {
     return;
   }
   if (!store.config.laravelApiUrl) {
-    logger.warn('Employee sync skipped: Laravel API URL not configured');
+    logger.warn('Employee sync skipped: ERP API URL not configured');
     return;
   }
 
@@ -52,15 +52,15 @@ async function runAttendanceFetch() {
   }
   const pushUrl = store.config.syncAttendanceUrl || store.config.laravelApiUrl;
   if (!pushUrl) {
-    logger.warn('Attendance push skipped: no URL configured (set Sync Attendance URL or Laravel API Base URL)');
+    logger.warn('Attendance push skipped: no URL configured (set Sync Attendance URL or ERP API Base URL)');
     return;
   }
 
-  logger.info('Running scheduled attendance push to Laravel...');
+  logger.info('Running scheduled attendance push to ERP...');
   emit('sync_started', { type: 'attendance_fetch' });
 
   // Push unpushed records already collected (from ADMS + TCP)
-  const unpushed = store.attendanceLogs.filter(r => !r.pushedToLaravel);
+  const unpushed = store.attendanceLogs.filter(r => !r.pushedToERP);
 
   if (unpushed.length === 0) {
     logger.info('Attendance sync: no new records to push');
@@ -72,7 +72,7 @@ async function runAttendanceFetch() {
   const pushResult = await pushAttendance(unpushed);
   if (pushResult.success) {
     markAttendancePushed(unpushed.map(r => r.id));
-    logger.info(`Pushed ${pushResult.count || unpushed.length} attendance records to Laravel`);
+    logger.info(`Pushed ${pushResult.count || unpushed.length} attendance records to ERP`);
     emit('sync_done', { type: 'attendance_fetch', success: true, count: unpushed.length });
   } else {
     logger.error('Attendance push failed: ' + pushResult.error);

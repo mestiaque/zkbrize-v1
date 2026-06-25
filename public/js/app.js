@@ -238,8 +238,8 @@ function renderAttendanceTable() {
   if (statusFilter) records = records.filter(r => r.status === statusFilter);
   if (methodFilter) records = records.filter(r => (r.verifyMethod||'').toLowerCase() === methodFilter);
   if (sourceFilter) records = records.filter(r => (r.source||'') === sourceFilter);
-  if (pushedFilter === 'pushed') records = records.filter(r => r.pushedToLaravel);
-  if (pushedFilter === 'new')    records = records.filter(r => !r.pushedToLaravel);
+  if (pushedFilter === 'pushed') records = records.filter(r => r.pushedToERP);
+  if (pushedFilter === 'new')    records = records.filter(r => !r.pushedToERP);
 
   badge.textContent = `${records.length} records`;
   badge.style.display = '';
@@ -250,7 +250,7 @@ function renderAttendanceTable() {
   }
 
   tbody.innerHTML = records.slice(0, 300).map(r => {
-    const isPushed = r.pushedToLaravel;
+    const isPushed = r.pushedToERP;
     const rowStyle = isPushed ? 'opacity:0.55' : '';
     const statusBadge = isPushed
       ? `<span class="tag tag-green" title="${r.pushedAt ? formatTime(r.pushedAt) : ''}">✓ Pushed</span>`
@@ -285,14 +285,14 @@ async function fetchAttendance() {
   setTimeout(() => { fetchState(); if (btn) { btn.disabled = false; btn.textContent = 'Fetch from Devices'; } }, 2000);
 }
 
-async function pushToLaravel() {
+async function pushToERP() {
   const btn = document.getElementById('btn-push-laravel');
   if (btn) { btn.disabled = true; btn.textContent = 'Pushing...'; }
-  toast('Pushing new records to Laravel...', 'info');
+  toast('Pushing new records to ERP...', 'info');
   const res = await api('/laravel/push-attendance', { onlyNew: true });
-  if (btn) { btn.disabled = false; btn.textContent = 'Push to Laravel'; }
+  if (btn) { btn.disabled = false; btn.textContent = 'Push to ERP'; }
   if (res?.success) {
-    if (res.count === 0) toast('All records already pushed to Laravel', 'info');
+    if (res.count === 0) toast('All records already pushed to ERP', 'info');
     else toast(`Pushed ${res.count} new records (${res.alreadyPushed||0} already done)`, 'success');
     fetchState();
   } else {
@@ -393,18 +393,18 @@ function showLoadFromMachineModal() {
   loadBridgeEmployees(true);
 }
 
-async function importFromLaravel() {
+async function importFromERP() {
   const btn = document.getElementById('import-laravel-btn');
   btn.disabled = true;
   btn.textContent = 'Loading…';
   const res = await api('/employees/import-from-laravel', {}, 'POST');
   btn.disabled = false;
-  btn.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M19 9h-4V3H9v6H5l7 7 7-7zm-8 2V5h2v6h1.17L12 13.17 9.83 11H11zm-6 7h14v2H5z"/></svg> Load from Laravel';
+  btn.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M19 9h-4V3H9v6H5l7 7 7-7zm-8 2V5h2v6h1.17L12 13.17 9.83 11H11zm-6 7h14v2H5z"/></svg> Load from ERP';
   if (!res?.success) {
-    toast(res?.error || 'Failed to load from Laravel', 'error');
+    toast(res?.error || 'Failed to load from ERP', 'error');
     return;
   }
-  toast(`${res.imported} employees loaded from Laravel and saved to bridge`, 'success');
+  toast(`${res.imported} employees loaded from ERP and saved to bridge`, 'success');
   loadBridgeEmployees();
 }
 
@@ -581,13 +581,13 @@ function applySyncToggleUI(type, enabled) {
   if (type === 'employee') {
     document.getElementById('emp-sync-fields').style.opacity = enabled ? '1' : '0.4';
     document.getElementById('emp-sync-status-text').textContent = enabled
-      ? 'Running — syncs employees from Laravel to devices'
+      ? 'Running — syncs employees from ERP to devices'
       : 'Disabled — schedule will not run';
     document.getElementById('emp-sync-status-text').style.color = enabled ? '' : 'var(--red)';
   } else {
     document.getElementById('att-sync-fields').style.opacity = enabled ? '1' : '0.4';
     document.getElementById('att-sync-status-text').textContent = enabled
-      ? 'Running — pushes new attendance records to Laravel'
+      ? 'Running — pushes new attendance records to ERP'
       : 'Disabled — schedule will not run';
     document.getElementById('att-sync-status-text').style.color = enabled ? '' : 'var(--red)';
   }
@@ -661,16 +661,16 @@ async function saveConfig() {
   fetchState();
 }
 
-async function testLaravel() {
+async function testERP() {
   const el = document.getElementById('laravel-test-result');
   el.innerHTML = '<span style="color:var(--text-2)">Testing connection...</span>';
   const res = await api('/laravel/test', {});
   if (res?.success) {
     el.innerHTML = '<div class="badge-green">Connected successfully</div>';
-    toast('Laravel API connected!', 'success');
+    toast('ERP API connected!', 'success');
   } else {
     el.innerHTML = `<div style="color:var(--red);font-size:12px">Failed: ${res?.message || 'Unknown error'}</div>`;
-    toast('Laravel connection failed', 'error');
+    toast('ERP connection failed', 'error');
   }
 }
 
@@ -748,7 +748,7 @@ function showSyncProgress(step) {
       </div>
       <div style="display:flex;align-items:center;gap:8px;opacity:.5">
         <span style="width:16px;height:16px;border-radius:50%;background:#444;display:flex;align-items:center;justify-content:center;font-size:10px">3</span>
-        Pushing to Laravel
+        Pushing to ERP
       </div>
     </div>`;
   syncProgressEl.style.display = '';

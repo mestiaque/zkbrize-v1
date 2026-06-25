@@ -144,7 +144,7 @@ function addAttendanceLog(record) {
     ...record,
     receivedAt: new Date().toISOString(),
     id: Date.now() + Math.random(),
-    pushedToLaravel: false,
+    pushedToERP: false,
     pushedAt: null,
   });
   if (store.attendanceLogs.length > MAX_LOGS) {
@@ -185,7 +185,7 @@ function markAttendancePushed(ids) {
   const now = new Date().toISOString();
   store.attendanceLogs.forEach(r => {
     if (idSet.has(String(r.id))) {
-      r.pushedToLaravel = true;
+      r.pushedToERP = true;
       r.pushedAt = now;
     }
   });

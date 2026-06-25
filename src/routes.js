@@ -110,7 +110,7 @@ router.post('/config', (req, res) => {
   res.json({ success: true, message: 'Config updated', schedulerStatus: getSchedulerStatus() });
 });
 
-// ── Laravel ────────────────────────────────────────────────────────
+// ── ERP ────────────────────────────────────────────────────────
 router.post('/laravel/test', async (req, res) => {
   const result = await testConnection();
   res.json(result);
@@ -157,7 +157,7 @@ router.post('/laravel/fetch-attendance', async (req, res) => {
 
 router.post('/laravel/push-attendance', async (req, res) => {
   const allRecords = store.attendanceLogs;
-  const unpushed = allRecords.filter(r => !r.pushedToLaravel);
+  const unpushed = allRecords.filter(r => !r.pushedToERP);
   const records = req.body.onlyNew !== false ? unpushed : allRecords;
   if (!records.length) return res.json({ success: true, count: 0, message: 'All records already pushed' });
   const result = await pushAttendance(records);
@@ -165,7 +165,7 @@ router.post('/laravel/push-attendance', async (req, res) => {
   res.json({ ...result, total: allRecords.length, pushed: records.length, alreadyPushed: allRecords.length - unpushed.length });
 });
 
-// Full sync: TCP fetch → push all to Laravel
+// Full sync: TCP fetch → push all to ERP
 router.post('/laravel/sync-all', async (req, res) => {
   const steps = [];
 
@@ -185,8 +185,8 @@ router.post('/laravel/sync-all', async (req, res) => {
   // ADMS data is already in store (pushed in real-time)
   const admsRecords = store.attendanceLogs.filter(r => r.source === 'adms').length;
 
-  // Step 2: push all unpushed records to Laravel
-  const unpushed = store.attendanceLogs.filter(r => !r.pushedToLaravel);
+  // Step 2: push all unpushed records to ERP
+  const unpushed = store.attendanceLogs.filter(r => !r.pushedToERP);
   let pushResult = { success: true, count: 0 };
   if (unpushed.length) {
     pushResult = await pushAttendance(unpushed);
@@ -255,8 +255,8 @@ router.post('/devices/:deviceId/fetch-attendance', async (req, res) => {
   res.json({ success: false, error: 'ADMS devices push automatically' });
 });
 
-// ── Laravel → Bridge import ────────────────────────────────────────
-// Fetch employees from Laravel and save them all to bridge store
+// ── ERP → Bridge import ────────────────────────────────────────
+// Fetch employees from ERP and save them all to bridge store
 router.post('/employees/import-from-laravel', async (req, res) => {
   const result = await fetchEmployees();
   if (!result.success) return res.json({ success: false, error: result.error });

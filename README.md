@@ -1,12 +1,12 @@
-# ZKTeco ↔ Laravel Bridge
+# ZKTeco ↔ ERP Bridge
 
-A Node.js application that bridges ZKTeco attendance devices with a Laravel API.
+A Node.js application that bridges ZKTeco attendance devices with a ERP API.
 
 ## Features
 
 - **ADMS Server** — newer ZKTeco devices push data in real-time
 - **TCP/IP Connector** — connect older devices via pull mode
-- **Laravel Sync** — bidirectional: employees from Laravel → devices, attendance from devices → Laravel
+- **ERP Sync** — bidirectional: employees from ERP → devices, attendance from devices → ERP
 - **Live Dashboard** — real-time UI with Socket.IO
 - **Scheduler** — automated sync via cron
 
@@ -48,9 +48,9 @@ ATTENDANCE_FETCH_SCHEDULE=*/15 * * * * # TCP device pull frequency
 
 ---
 
-## Laravel API Endpoints Required
+## ERP API Endpoints Required
 
-Add these to your Laravel app:
+Add these to your ERP app:
 
 ```php
 // routes/api.php
@@ -166,7 +166,7 @@ zk-bridge/
 │   ├── tcpip/
 │   │   └── connector.js   # TCP/IP device connector
 │   └── laravel/
-│       └── api.js         # Laravel API client
+│       └── api.js         # ERP API client
 ├── public/
 │   ├── index.html
 │   ├── css/style.css

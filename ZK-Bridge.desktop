@@ -2,7 +2,7 @@
 Version=1.0
 Type=Application
 Name=ZK Bridge
-Comment=ZKTeco Laravel Bridge Server
+Comment=ZKTeco ERP Bridge Server
 Exec=bash -c "cd /home/estiaque/Downloads/zk-laravel-bridge/zk-bridge && ./start.sh"
 Icon=/home/estiaque/Downloads/zk-laravel-bridge/zk-bridge/public/favicon.ico
 Terminal=false

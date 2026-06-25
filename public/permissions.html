@@ -144,14 +144,14 @@ const SCHEMA = {
   employees: {
     label: 'Employees Page',
     items: {
-      btn_load_laravel:  { label: 'Button: Load from Laravel', hint: 'Fetch employees from Laravel API and save to bridge' },
+      btn_load_laravel:  { label: 'Button: Load from ERP', hint: 'Fetch employees from ERP API and save to bridge' },
       btn_load_machine:  { label: 'Button: Load from Machine', hint: 'Load employees from TCP-enabled ZKTeco device' },
       btn_set_device:    { label: 'Button: Set to Device',     hint: 'Push employees to connected TCP device' },
       btn_add_employee:  { label: 'Button: Add Employee',      hint: 'Manually create a new employee' },
       export_csv:        { label: 'Export CSV button',         hint: 'Download employee list as CSV for ZKBio Security' },
       export_dat:        { label: 'Export DAT (USB) button',   hint: 'Download user.dat for ZKTeco USB import' },
       card_export_guide: { label: 'Card: Export Guide',        hint: 'Instructions for CSV/DAT export' },
-      card_api_docs:     { label: 'Card: Laravel API Docs',    hint: 'Code snippet for Laravel endpoint setup' },
+      card_api_docs:     { label: 'Card: ERP API Docs',    hint: 'Code snippet for ERP endpoint setup' },
     }
   },
   devices: {
@@ -166,7 +166,7 @@ const SCHEMA = {
     label: 'Attendance Page',
     items: {
       btn_fetch:        { label: 'Button: Fetch from Devices', hint: 'Pull attendance from TCP devices' },
-      btn_push_laravel: { label: 'Button: Push to Laravel',    hint: 'Send attendance records to Laravel API' },
+      btn_push_laravel: { label: 'Button: Push to ERP',    hint: 'Send attendance records to ERP API' },
     }
   },
 };
