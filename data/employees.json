@@ -1,1 +1,10 @@
-{}
+{
+  "12311": {
+    "uid": 12311,
+    "employee_id": "111012",
+    "name": "XXXXXS",
+    "password": "",
+    "privilege": 0,
+    "updatedAt": "2026-06-25T10:55:22.167Z"
+  }
+}
