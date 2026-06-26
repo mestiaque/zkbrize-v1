@@ -10,7 +10,7 @@ const logger = require('./logger');
 const { store, loadConfigFile } = require('./store');
 const routes = require('./routes');
 const authRoutes = require('./authRoutes');
-const { requireAuth } = require('./auth');
+const { requireAuth, requireSuperAdmin } = require('./auth');
 const { startADMSServer, setSocketIO: admsSetIO } = require('./adms/server');
 const { setSocketIO: tcpSetIO } = require('./tcpip/connector');
 const { startScheduler, setSocketIO: schedSetIO } = require('./scheduler');
@@ -49,6 +49,12 @@ app.use(session({
 }));
 
 // ── Public routes (no auth required) ──────────────────────────────
+// Serve logo and favicon before auth so login page can display them
+const publicDir = path.join(__dirname, '../public');
+app.get('/logo.png',    (req, res) => res.sendFile(path.join(publicDir, 'logo.png')));
+app.get('/favicon.png', (req, res) => res.sendFile(path.join(publicDir, 'favicon.png')));
+app.get('/favicon.ico', (req, res) => res.sendFile(path.join(publicDir, 'favicon.png')));
+
 app.get('/login', (req, res) => {
   if (req.session?.user) return res.redirect('/');
   res.sendFile(path.join(__dirname, '../public/login.html'));
@@ -60,8 +66,8 @@ app.use(requireAuth);
 
 app.use(express.static(path.join(__dirname, '../public')));
 app.use('/api', routes);
-app.get('/permissions', (req, res) => res.sendFile(path.join(__dirname, '../public/permissions.html')));
-app.get('/users', (req, res) => res.sendFile(path.join(__dirname, '../public/users.html')));
+app.get('/permissions', requireSuperAdmin, (req, res) => res.sendFile(path.join(__dirname, '../public/permissions.html')));
+app.get('/users', requireSuperAdmin, (req, res) => res.sendFile(path.join(__dirname, '../public/users.html')));
 
 // ── Socket.IO ──────────────────────────────────────────────────────
 io.on('connection', (socket) => {

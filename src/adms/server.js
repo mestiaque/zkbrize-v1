@@ -1,7 +1,6 @@
 const http = require('http');
 const logger = require('../logger');
 const { addDevice, updateDevice, addAttendanceLog, store } = require('../store');
-const { pushAttendanceSingle } = require('../laravel/api');
 
 let io = null;
 let admsServer = null;
@@ -14,6 +13,8 @@ const deviceCommandQueue = {};   // sn -> [{ id, cmd }, ...]  (array, FIFO)
 const cmdOwnership = {};         // cmdId -> { key, isLast } — tracks which promise owns which cmd
 const pendingUserRequests = {};  // key -> { resolve, reject, timer }
 const pendingOptionPush = new Set();
+const pendingAttLogPush = new Set();
+const pendingAttLogFilter = {};  // sn -> { fromDate, toDate } — date filter for attlog fetch
 const deviceUserCache = {};      // sn -> { employees, receivedAt } — last push from device
 let cmdSerial = 1;
 
@@ -404,16 +405,23 @@ function startADMSServer(port) {
         // Accept ATTLOG or empty table (some devices omit it)
         if (table === 'ATTLOG' || table === '') {
           let pushed = 0;
+          const filter = pendingAttLogFilter[sn] || null;
           for (const line of recordLines) {
             const parts = line.split('\t');
             // Format: PIN \t Time \t Status \t Verify \t WorkCode \t Reserved
             if (parts.length >= 2 && parts[0].trim()) {
               const verifyCode = parts[3]?.trim() || '1';
               const verifyMap = { '0':'password', '1':'fingerprint', '2':'face', '3':'card', '4':'fingerprint', '15':'face' };
+              const recTime = parts[1].trim();
+              if (filter) {
+                const recDate = new Date(recTime);
+                if (filter.fromDate && recDate < new Date(filter.fromDate + 'T00:00:00')) continue;
+                if (filter.toDate   && recDate > new Date(filter.toDate   + 'T23:59:59')) continue;
+              }
               const record = {
                 deviceId: sn,
                 employeeId: parts[0].trim(),
-                time: parts[1].trim(),
+                time: recTime,
                 status: parts[2]?.trim() || '0',
                 verify: verifyCode,
                 verifyMethod: verifyMap[verifyCode] || 'fingerprint',
@@ -423,9 +431,6 @@ function startADMSServer(port) {
               };
               addAttendanceLog(record);
               emit('attendance', record);
-              if (store.config.laravelApiUrl) {
-                pushAttendanceSingle(record).catch(() => {});
-              }
               pushed++;
             }
           }
@@ -459,6 +464,34 @@ function startADMSServer(port) {
         }
 
         emit('state_update', { type: 'device_update' });
+
+        // Fetch historical attendance logs from device
+        if (pendingAttLogPush.has(sn)) {
+          pendingAttLogPush.delete(sn);
+          const attFilter = pendingAttLogFilter[sn];
+          const attStamp = attFilter?.fromDate ? Math.floor(new Date(attFilter.fromDate + 'T00:00:00').getTime() / 1000) : 0;
+          logger.info(`ADMS sending ATTLOGStamp=${attStamp} to SN=${sn}`);
+          res.writeHead(200, { 'Content-Type': 'text/plain' });
+          res.end(
+            `GET OPTION FROM: ${sn}\r\n` +
+            `ATTLOGStamp=${attStamp}\r\n` +
+            `OPERLOGStamp=9999\r\n` +
+            `ATTPHOTOStamp=None\r\n` +
+            `UserInfoStamp=9999\r\n` +
+            `ErrorDelay=30\r\n` +
+            `Delay=10\r\n` +
+            `TransTimes=00:00;14:05\r\n` +
+            `TransInterval=1\r\n` +
+            `TransFlag=TransData AttLog\r\n` +
+            `TimeZone=6\r\n` +
+            `Realtime=1\r\n` +
+            `Encrypt=None\r\n` +
+            `ServerVer=2.4.1\r\n` +
+            `TableNameStamp=None\r\n` +
+            `DateTime=${nowStr()}\r\n`
+          );
+          return;
+        }
 
         // If a "load from device" was requested, send option block with UserInfoStamp=0.
         // Some firmware responds to 0 but ignores "None"; others need None.
@@ -612,4 +645,25 @@ function restartADMSServer(newPort) {
   });
 }
 
-module.exports = { startADMSServer, restartADMSServer, setSocketIO, requestUsersFromADMS, requestSetUserOnADMS, requestDeleteUserOnADMS, pendingOptionPush, deviceUserCache };
+function requestAttLogsFromADMS(sn, fromDate = null, toDate = null) {
+  if (!store.devices[sn]) return Promise.reject(new Error('Device not found'));
+
+  // Store date filter so ATTLOG handler can apply it
+  if (fromDate || toDate) {
+    pendingAttLogFilter[sn] = { fromDate, toDate };
+    // Clear filter after 5 minutes (in case device never responds)
+    setTimeout(() => { delete pendingAttLogFilter[sn]; }, 5 * 60 * 1000);
+  } else {
+    delete pendingAttLogFilter[sn];
+  }
+
+  pendingAttLogPush.add(sn);
+  const qId = cmdSerial++;
+  cmdOwnership[qId] = { key: sn, isLast: true, ignoreError: true };
+  enqueue(sn, [{ id: qId, cmd: 'DATA QUERY ATTLOG' }]);
+  const rangeStr = fromDate ? ` from=${fromDate}${toDate ? ' to='+toDate : ''}` : ' (all)';
+  logger.info(`ADMS attlog fetch queued for SN=${sn}${rangeStr}`);
+  return Promise.resolve({ queued: true });
+}
+
+module.exports = { startADMSServer, restartADMSServer, setSocketIO, requestUsersFromADMS, requestSetUserOnADMS, requestDeleteUserOnADMS, requestAttLogsFromADMS, pendingOptionPush, deviceUserCache };

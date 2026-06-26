@@ -231,9 +231,13 @@ function renderAttendanceTable() {
   const methodFilter = val('filter-method') || '';
   const sourceFilter = val('filter-source') || '';
   const pushedFilter = val('filter-pushed') || '';
+  const fetchFrom    = val('att-fetch-from') || '';
+  const fetchTo      = val('att-fetch-to')   || '';
 
   if (empFilter)    records = records.filter(r => String(r.employeeId||'').toLowerCase().includes(empFilter));
   if (dateFilter)   records = records.filter(r => (r.time||'').startsWith(dateFilter));
+  if (fetchFrom)    records = records.filter(r => r.time && new Date(r.time) >= new Date(fetchFrom + 'T00:00:00'));
+  if (fetchTo)      records = records.filter(r => r.time && new Date(r.time) <= new Date(fetchTo   + 'T23:59:59'));
   if (deviceFilter) records = records.filter(r => r.deviceId === deviceFilter);
   if (statusFilter) records = records.filter(r => r.status === statusFilter);
   if (methodFilter) records = records.filter(r => (r.verifyMethod||'').toLowerCase() === methodFilter);
@@ -274,31 +278,97 @@ function filterAttendance() { renderAttendanceTable(); }
 function filterEmployeeTable() { renderMachineEmployeeTable(); }
 
 function clearAttendanceFilters() {
-  ['filter-empid','filter-date','filter-device','filter-status','filter-method','filter-source','filter-pushed']
+  ['filter-empid','filter-date','filter-device','filter-status','filter-method','filter-source','filter-pushed',
+   'att-fetch-from','att-fetch-to']
     .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
-  renderAttendanceTable();
+  reloadAttendanceLogs(null, null);
 }
 
 async function fetchAttendance() {
   const btn = document.getElementById('btn-fetch-attendance');
+  const fromDate = document.getElementById('att-fetch-from')?.value || null;
+  const toDate   = document.getElementById('att-fetch-to')?.value   || null;
   if (btn) { btn.disabled = true; btn.textContent = 'Fetching...'; }
-  toast('Fetching from TCP devices...', 'info');
-  await api('/laravel/fetch-attendance');
-  setTimeout(() => { fetchState(); if (btn) { btn.disabled = false; btn.textContent = 'Fetch from Devices'; } }, 2000);
+  const rangeMsg = fromDate ? ` (${fromDate}${toDate ? ' → ' + toDate : ''})` : '';
+  toast('Fetching from TCP devices' + rangeMsg + '...', 'info');
+  const tcpDevices = (state.devices || []).filter(d => d.type === 'tcp' && d.status === 'connected');
+  if (!tcpDevices.length) {
+    toast('No connected TCP devices found', 'error');
+    if (btn) { btn.disabled = false; btn.textContent = 'Fetch TCP'; }
+    return;
+  }
+  for (const d of tcpDevices) {
+    const r = await api(`/devices/${encodeURIComponent(d.id)}/fetch-attendance`, { fromDate, toDate });
+    if (r?.success) toast(`${d.name || d.id}: ${r.count} records fetched`, 'success');
+    else if (r?.error) toast(`${d.name || d.id}: ${r.error}`, 'error');
+  }
+  if (btn) { btn.disabled = false; btn.textContent = 'Fetch TCP'; }
+  await reloadAttendanceLogs(fromDate, toDate);
+}
+
+async function fetchAttFromADMS() {
+  const btn = document.getElementById('btn-fetch-adms');
+  const fromDate = document.getElementById('att-fetch-from')?.value || null;
+  const toDate   = document.getElementById('att-fetch-to')?.value   || null;
+  const admsDevices = (state.devices || []).filter(d => d.type === 'adms' && d.status === 'connected');
+  if (!admsDevices.length) { toast('No connected ADMS device found', 'error'); return; }
+
+  btn.disabled = true; btn.textContent = 'Queuing...';
+  const rangeMsg = fromDate ? ` (${fromDate}${toDate ? ' → ' + toDate : ''})` : ' (all history)';
+  toast(`Requesting attendance from ${admsDevices.length} ADMS device(s)${rangeMsg}…`, 'info');
+
+  let ok = 0;
+  for (const d of admsDevices) {
+    const res = await api(`/devices/${d.id}/fetch-attlogs`, { fromDate, toDate });
+    if (res?.success) ok++;
+    else toast(`${d.name || d.id}: ${res?.error || 'Failed'}`, 'error');
+  }
+
+  btn.disabled = false; btn.innerHTML = '↓ Fetch ADMS';
+  if (ok > 0) {
+    toast(`Queued! Device will push attendance in ~10s…`, 'info');
+    // Wait for device to push, then reload with date filter applied
+    setTimeout(async () => {
+      await reloadAttendanceLogs(fromDate, toDate);
+      toast('Attendance logs updated.', 'success');
+    }, 12000);
+  }
+}
+
+async function reloadAttendanceLogs(fromDate, toDate) {
+  const qs = new URLSearchParams({ limit: 5000 });
+  if (fromDate) qs.set('fromDate', fromDate);
+  if (toDate)   qs.set('toDate', toDate);
+  const data = await api(`/attendance?${qs.toString()}`);
+  if (data?.records) {
+    attendanceAll = data.records;
+    renderAttendanceTable();
+  }
 }
 
 async function pushToERP() {
   const btn = document.getElementById('btn-push-laravel');
-  if (btn) { btn.disabled = true; btn.textContent = 'Pushing...'; }
-  toast('Pushing new records to ERP...', 'info');
+  if (btn) { btn.disabled = true; btn.textContent = 'Pushing…'; }
+
+  const unpushed = attendanceAll.filter(r => !r.pushedToERP);
+  if (!unpushed.length) {
+    toast('All records already pushed to ERP', 'info');
+    if (btn) { btn.disabled = false; btn.textContent = 'Push to ERP'; }
+    return;
+  }
+
+  toast(`Pushing ${unpushed.length} unpushed records to ERP…`, 'info');
   const res = await api('/laravel/push-attendance', { onlyNew: true });
+
   if (btn) { btn.disabled = false; btn.textContent = 'Push to ERP'; }
   if (res?.success) {
-    if (res.count === 0) toast('All records already pushed to ERP', 'info');
-    else toast(`Pushed ${res.count} new records (${res.alreadyPushed||0} already done)`, 'success');
+    toast(`${res.count} records pushed (${res.alreadyPushed || 0} already done)`, 'success');
+    const fromDate = document.getElementById('att-fetch-from')?.value || null;
+    const toDate   = document.getElementById('att-fetch-to')?.value   || null;
+    await reloadAttendanceLogs(fromDate, toDate);
     fetchState();
   } else {
-    toast(`Push failed: ${res?.error}`, 'error');
+    toast(`Push failed: ${res?.error || 'Unknown error'}`, 'error');
   }
 }
 
@@ -916,11 +986,18 @@ const PERM_SELECTORS = {
   'devices.card_add_tcp':       '#card-add-tcp',
   'devices.card_adms_info':     '#card-adms-info',
   'devices.card_ping_test':     '#card-ping-test',
+  'attendance.date_range':        '#att-date-range-wrap',
   'attendance.btn_fetch':        '#btn-fetch-attendance',
+  'attendance.btn_fetch_adms':   '#btn-fetch-adms',
   'attendance.btn_push_laravel': '#btn-push-laravel',
 };
 
 let currentPermissions = {};
+
+// Elements that need a specific display value when shown (not the default '')
+const PERM_DISPLAY_OVERRIDE = {
+  '#att-date-range-wrap': 'flex',
+};
 
 async function applyPermissions() {
   try {
@@ -931,7 +1008,7 @@ async function applyPermissions() {
       const [section, key] = permKey.split('.');
       const allowed = permissions?.[section]?.[key] !== false;
       document.querySelectorAll(selector).forEach(el => {
-        el.style.display = allowed ? '' : 'none';
+        el.style.display = allowed ? (PERM_DISPLAY_OVERRIDE[selector] || '') : 'none';
       });
     }
   } catch (e) { console.warn('Could not load permissions', e); }
@@ -949,7 +1026,7 @@ async function loadCurrentUser() {
     const info = document.getElementById('sidebar-user-info');
     if (info) info.textContent = user.username + ' (' + user.role + ')';
     const usersLink = document.getElementById('nav-users-link');
-    if (usersLink && (user.role === 'superadmin' || user.role === 'admin')) usersLink.style.display = 'flex';
+    if (usersLink && user.role === 'superadmin') usersLink.style.display = 'flex';
   } catch {}
 }
 
@@ -958,9 +1035,19 @@ async function doLogout() {
   window.location.href = '/login';
 }
 
+function initDashboardGreeting() {
+  const h = new Date().getHours();
+  const g = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
+  const el = document.getElementById('dash-greeting');
+  if (el) el.textContent = g + ' 👋';
+  const d = document.getElementById('dash-date');
+  if (d) d.textContent = new Date().toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   loadCurrentUser();
   applyPermissions();
+  initDashboardGreeting();
   const savedPage = localStorage.getItem('activePage') || 'dashboard';
   showPage(savedPage);
   fetchState();

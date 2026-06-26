@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ZK Bridge — Login</title>
+<link rel="icon" type="image/png" href="/logo.png">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   body {
@@ -68,10 +69,11 @@
 <body>
 <div class="card">
   <div class="logo">
-    <div class="logo-icon">ZK</div>
+    <img src="/logo.png" alt="Natore-IT" style="width:40px;height:40px;border-radius:10px;object-fit:cover" onerror="this.style.display='none';document.getElementById('login-logo-fallback').style.display='flex'">
+    <div id="login-logo-fallback" class="logo-icon" style="display:none">ZK</div>
     <div>
       <div class="logo-text">ZK Bridge</div>
-      <div class="logo-sub">ERP Connector</div>
+      <div class="logo-sub">by Natore-IT</div>
     </div>
   </div>
   <h2>Sign in</h2>

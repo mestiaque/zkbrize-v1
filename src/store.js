@@ -21,7 +21,7 @@ const DEFAULT_PERMISSIONS = {
     card_add_tcp: true, card_adms_info: true, card_ping_test: true,
   },
   attendance: {
-    btn_fetch: true, btn_push_laravel: true,
+    btn_fetch: true, btn_fetch_adms: true, btn_push_laravel: true, date_range: true,
   },
 };
 
@@ -106,7 +106,7 @@ const store = {
 };
 
 // Max recent logs to keep in memory
-const MAX_LOGS = 500;
+const MAX_LOGS = 10000;
 const MAX_SYNC_LOG = 100;
 
 function addDevice(device) {
@@ -141,6 +141,12 @@ function removeDevice(deviceId) {
 }
 
 function addAttendanceLog(record) {
+  const isDup = store.attendanceLogs.some(r =>
+    r.employeeId === record.employeeId &&
+    r.time === record.time &&
+    r.deviceId === record.deviceId
+  );
+  if (isDup) return false;
   store.attendanceLogs.unshift({
     ...record,
     receivedAt: new Date().toISOString(),
@@ -239,7 +245,7 @@ function updateStats() {
 function getState() {
   return {
     devices: Object.values(store.devices),
-    attendanceLogs: store.attendanceLogs.slice(0, 50),
+    attendanceLogs: store.attendanceLogs.slice(0, 2000),
     syncLog: store.syncLog.slice(0, 20),
     stats: store.stats,
     config: {

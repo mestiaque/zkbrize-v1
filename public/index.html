@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ZKTeco ↔ ERP Bridge</title>
+<link rel="icon" type="image/png" href="/favicon.png">
 <script src="https://cdn.socket.io/4.6.0/socket.io.min.js"></script>
 <link rel="stylesheet" href="css/style.css">
 </head>
@@ -14,7 +15,7 @@
   <nav class="sidebar">
     <div class="brand">
       <a href="https://natoreit.com" target="_blank" style="display:flex;align-items:center;gap:10px;text-decoration:none">
-        <img src="/logo.svg" alt="Natore-IT" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" style="height:36px;width:36px;border-radius:8px;object-fit:contain">
+        <img src="/logo.png" alt="Natore-IT" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" style="height:36px;width:36px;border-radius:8px;object-fit:cover">
         <div class="brand-icon" style="display:none">ZK</div>
       </a>
       <div>
@@ -67,7 +68,7 @@
 
     <div class="sidebar-bottom">
       <div id="sidebar-user-info" style="padding:10px 16px 4px;font-size:12px;color:#888"></div>
-      <a href="/users" id="nav-users-link" style="display:none;padding:8px 16px;font-size:12px;color:#6c63ff;text-decoration:none;display:flex;align-items:center;gap:6px">
+      <a href="/users" id="nav-users-link" style="display:none;padding:8px 16px;font-size:12px;color:#6c63ff;text-decoration:none;align-items:center;gap:6px">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
         Manage Users
       </a>
@@ -85,10 +86,6 @@
       <div class="status-row">
         <span class="status-dot" id="status-adms"></span>
         <span>ADMS Server</span>
-      </div>
-      <div class="status-row">
-        <span class="status-dot" id="status-adms"></span>
-        <span>Natore-IT</span>
       </div>
     </div>
   </nav>
@@ -112,34 +109,55 @@
 
     <!-- Pages -->
     <div id="page-dashboard" class="page active">
-      <!-- Stats -->
+
+      <!-- Welcome banner -->
+      <div class="dash-welcome">
+        <div>
+          <div class="dash-greeting" id="dash-greeting">Good morning</div>
+          <div class="dash-date" id="dash-date"></div>
+        </div>
+        <div class="dash-brand-badge">
+          <img src="/logo.png" style="width:28px;height:28px;border-radius:6px;object-fit:cover">
+          <span>ZK Bridge</span>
+        </div>
+      </div>
+
+      <!-- Stat cards -->
       <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-icon teal"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2z"/></svg></div>
-          <div class="stat-info">
-            <div class="stat-value" id="stat-total-devices">0</div>
+        <div class="stat-card stat-teal">
+          <div class="stat-card-inner">
             <div class="stat-label">Total Devices</div>
+            <div class="stat-value" id="stat-total-devices">0</div>
+          </div>
+          <div class="stat-icon-big">
+            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2z"/></svg>
           </div>
         </div>
-        <div class="stat-card">
-          <div class="stat-icon green"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg></div>
-          <div class="stat-info">
-            <div class="stat-value" id="stat-connected">0</div>
+        <div class="stat-card stat-green">
+          <div class="stat-card-inner">
             <div class="stat-label">Connected</div>
+            <div class="stat-value" id="stat-connected">0</div>
+          </div>
+          <div class="stat-icon-big">
+            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
           </div>
         </div>
-        <div class="stat-card">
-          <div class="stat-icon blue"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2z"/></svg></div>
-          <div class="stat-info">
-            <div class="stat-value" id="stat-attendance">0</div>
+        <div class="stat-card stat-blue">
+          <div class="stat-card-inner">
             <div class="stat-label">Attendance Records</div>
+            <div class="stat-value" id="stat-attendance">0</div>
+          </div>
+          <div class="stat-icon-big">
+            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2z"/></svg>
           </div>
         </div>
-        <div class="stat-card">
-          <div class="stat-icon amber"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg></div>
-          <div class="stat-info">
-            <div class="stat-value" id="stat-last-sync">Never</div>
+        <div class="stat-card stat-amber">
+          <div class="stat-card-inner">
             <div class="stat-label">Last Sync</div>
+            <div class="stat-value stat-value-sm" id="stat-last-sync">Never</div>
+          </div>
+          <div class="stat-icon-big">
+            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/></svg>
           </div>
         </div>
       </div>
@@ -148,8 +166,11 @@
         <!-- Devices panel -->
         <div class="card">
           <div class="card-header">
-            <div class="card-title">Connected Devices</div>
-            <button class="btn-sm" onclick="showPage('devices', document.querySelector('[data-page=devices]'))">Manage</button>
+            <div style="display:flex;align-items:center;gap:8px">
+              <div style="width:8px;height:8px;border-radius:50%;background:var(--green)"></div>
+              <div class="card-title">Connected Devices</div>
+            </div>
+            <button class="btn-sm" onclick="showPage('devices', document.querySelector('[data-page=devices]'))">Manage →</button>
           </div>
           <div id="dashboard-devices">
             <div class="empty-state">No devices connected yet</div>
@@ -159,8 +180,11 @@
         <!-- Recent activity -->
         <div class="card">
           <div class="card-header">
-            <div class="card-title">Recent Activity</div>
-            <button class="btn-sm" onclick="showPage('attendance', document.querySelector('[data-page=attendance]'))">View All</button>
+            <div style="display:flex;align-items:center;gap:8px">
+              <div style="width:8px;height:8px;border-radius:50%;background:var(--primary)"></div>
+              <div class="card-title">Recent Activity</div>
+            </div>
+            <button class="btn-sm" onclick="showPage('attendance', document.querySelector('[data-page=attendance]'))">View All →</button>
           </div>
           <div id="dashboard-activity">
             <div class="empty-state">No activity yet</div>
@@ -171,7 +195,10 @@
       <!-- Sync log -->
       <div class="card mt">
         <div class="card-header">
-          <div class="card-title">Sync History</div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--amber)"></div>
+            <div class="card-title">Sync History</div>
+          </div>
         </div>
         <div id="dashboard-synclog">
           <div class="empty-state">No sync history</div>
@@ -368,14 +395,21 @@ Route::middleware('auth:sanctum')->prefix('zk')->group(function() {
 
     <!-- Attendance Page -->
     <div id="page-attendance" class="page">
-      <div class="section-header">
-        <div>
-          <h2>Attendance Records</h2>
-          <p class="sub">Real-time attendance data from all devices</p>
+      <div class="section-header" style="align-items:center">
+        <div style="white-space:nowrap">
+          <h2 style="margin:0">Attendance Records</h2>
+          <p class="sub" style="margin:2px 0 0">Real-time attendance data from all devices</p>
         </div>
-        <div style="display:flex;gap:8px">
-          <button class="btn" id="btn-fetch-attendance" onclick="fetchAttendance()">Fetch from Devices</button>
-          <button class="btn btn-primary" id="btn-push-laravel" onclick="pushToERP()">Push to ERP</button>
+        <div style="display:flex;gap:6px;align-items:center;flex:1;margin-left:16px">
+          <span id="att-date-range-wrap" style="display:flex;align-items:center;gap:6px">
+          <label style="font-size:12px;color:#6b7280;white-space:nowrap">From</label>
+          <input type="date" id="att-fetch-from" style="padding:5px 8px;border:1px solid #e5e7eb;border-radius:6px;font-size:12px;width:130px" onchange="reloadAttendanceLogs(this.value||null,document.getElementById('att-fetch-to').value||null)">
+          <label style="font-size:12px;color:#6b7280;white-space:nowrap">To</label>
+          <input type="date" id="att-fetch-to" style="padding:5px 8px;border:1px solid #e5e7eb;border-radius:6px;font-size:12px;width:130px" onchange="reloadAttendanceLogs(document.getElementById('att-fetch-from').value||null,this.value||null)">
+          </span>
+          <button class="btn" id="btn-fetch-attendance" onclick="fetchAttendance()" style="white-space:nowrap">Fetch TCP</button>
+          <button class="btn" id="btn-fetch-adms" onclick="fetchAttFromADMS()" title="Pull stored attendance from ADMS device" style="white-space:nowrap">↓ Fetch ADMS</button>
+          <button class="btn btn-primary" id="btn-push-laravel" onclick="pushToERP()" style="white-space:nowrap">Push to ERP</button>
         </div>
       </div>
 

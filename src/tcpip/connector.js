@@ -258,7 +258,7 @@ async function connectTCPDevice(config) {
   }
 }
 
-async function fetchAttendanceFromTCP(deviceId) {
+async function fetchAttendanceFromTCP(deviceId, fromDate = null, toDate = null) {
   const device = tcpDevices[deviceId];
   if (!device || !device.connected) {
     return { success: false, error: 'Device not connected' };
@@ -268,7 +268,16 @@ async function fetchAttendanceFromTCP(deviceId) {
     const records = await device.getAttendance();
     logger.info(`Fetched ${records.length} attendance records from TCP device ${deviceId}`);
 
+    const from = fromDate ? new Date(fromDate + 'T00:00:00') : null;
+    const to   = toDate   ? new Date(toDate   + 'T23:59:59') : null;
+
+    let saved = 0;
     for (const rec of records) {
+      if (from || to) {
+        const recDate = new Date(rec.time);
+        if (from && recDate < from) continue;
+        if (to   && recDate > to)   continue;
+      }
       const record = {
         deviceId,
         employeeId: rec.employeeId,
@@ -278,18 +287,19 @@ async function fetchAttendanceFromTCP(deviceId) {
       };
       addAttendanceLog(record);
       emit('attendance', record);
+      saved++;
     }
 
     addSyncLog({
       type: 'tcp_attendance_fetch',
       status: 'success',
       deviceId,
-      count: records.length,
-      message: `Fetched ${records.length} records from ${deviceId}`,
+      count: saved,
+      message: `Fetched ${saved} records from ${deviceId}` + (from || to ? ` (filtered from ${records.length})` : ''),
     });
 
-    emit('state_update', { type: 'attendance', count: records.length });
-    return { success: true, count: records.length, records };
+    emit('state_update', { type: 'attendance', count: saved });
+    return { success: true, count: saved, total: records.length };
   } catch (err) {
     logger.error(`Failed to fetch attendance from ${deviceId}: ${err.message}`);
     return { success: false, error: err.message };

@@ -5,7 +5,7 @@ const { exec } = require('child_process');
 const { store, getState, clearLogs, upsertEmployee, deleteEmployee, markAttendancePushed, markEmployeesSynced, savePermissions, DEFAULT_PERMISSIONS, saveConfigFile } = require('./store');
 const { testConnection, fetchEmployees, pushAttendance } = require('./laravel/api');
 const { connectTCPDevice, fetchAttendanceFromTCP, disconnectTCPDevice, syncEmployeesToTCP, getEmployeesFromDevice, setEmployeeOnDevice, deleteEmployeeFromDevice } = require('./tcpip/connector');
-const { requestSetUserOnADMS, requestDeleteUserOnADMS, requestUsersFromADMS, pendingOptionPush, restartADMSServer, deviceUserCache } = require('./adms/server');
+const { requestSetUserOnADMS, requestDeleteUserOnADMS, requestUsersFromADMS, requestAttLogsFromADMS, pendingOptionPush, restartADMSServer, deviceUserCache } = require('./adms/server');
 const { runEmployeeSync, runAttendanceFetch, updateSchedule, getSchedulerStatus } = require('./scheduler');
 const logger = require('./logger');
 const fs = require('fs');
@@ -190,12 +190,18 @@ router.post('/laravel/fetch-attendance', async (req, res) => {
 
 router.post('/laravel/push-attendance', async (req, res) => {
   const allRecords = store.attendanceLogs;
-  const unpushed = allRecords.filter(r => !r.pushedToERP);
-  const records = req.body.onlyNew !== false ? unpushed : allRecords;
+  const unpushed   = allRecords.filter(r => !r.pushedToERP);
+  const records    = req.body.onlyNew !== false ? unpushed : allRecords;
   if (!records.length) return res.json({ success: true, count: 0, message: 'All records already pushed' });
+  logger.info(`Push to ERP: sending ${records.length} records in one request`);
   const result = await pushAttendance(records);
   if (result.success) markAttendancePushed(records.map(r => r.id));
-  res.json({ ...result, total: allRecords.length, pushed: records.length, alreadyPushed: allRecords.length - unpushed.length });
+  res.json({
+    ...result,
+    total: allRecords.length,
+    pushed: records.length,
+    alreadyPushed: allRecords.length - unpushed.length,
+  });
 });
 
 // Full sync: TCP fetch → push all to ERP
@@ -282,7 +288,8 @@ router.post('/devices/:deviceId/fetch-attendance', async (req, res) => {
   if (!device) return res.status(404).json({ error: 'Device not found' });
 
   if (device.type === 'tcp') {
-    const result = await fetchAttendanceFromTCP(deviceId);
+    const { fromDate, toDate } = req.body || {};
+    const result = await fetchAttendanceFromTCP(deviceId, fromDate || null, toDate || null);
     return res.json(result);
   }
   res.json({ success: false, error: 'ADMS devices push automatically' });
@@ -548,13 +555,38 @@ router.post('/devices/:deviceId/sync-employees', async (req, res) => {
   res.json({ success: false, error: 'Unknown device type' });
 });
 
+// Fetch all historical attendance from ADMS device
+router.post('/devices/:deviceId/fetch-attlogs', async (req, res) => {
+  const { deviceId } = req.params;
+  const device = store.devices[deviceId];
+  if (!device) return res.status(404).json({ error: 'Device not found' });
+  if (device.type !== 'adms') return res.json({ success: false, error: 'Only ADMS devices support this' });
+  const { fromDate, toDate } = req.body || {};
+  try {
+    await requestAttLogsFromADMS(deviceId, fromDate || null, toDate || null);
+    res.json({ success: true, message: 'Attendance fetch queued. Device will push logs on next heartbeat (within 10s).' });
+  } catch (e) {
+    res.json({ success: false, error: e.message });
+  }
+});
+
 // ── Attendance Logs ────────────────────────────────────────────────
 router.get('/attendance', (req, res) => {
-  const limit = parseInt(req.query.limit) || 100;
+  const limit    = parseInt(req.query.limit) || 5000;
   const deviceId = req.query.deviceId;
+  const fromDate = req.query.fromDate || null;
+  const toDate   = req.query.toDate   || null;
   let logs = store.attendanceLogs;
   if (deviceId) logs = logs.filter(l => l.deviceId === deviceId);
-  res.json({ records: logs.slice(0, limit), total: logs.length });
+  if (fromDate) {
+    const from = new Date(fromDate + 'T00:00:00');
+    logs = logs.filter(l => new Date(l.time) >= from);
+  }
+  if (toDate) {
+    const to = new Date(toDate + 'T23:59:59');
+    logs = logs.filter(l => new Date(l.time) <= to);
+  }
+  res.json({ records: logs.slice(0, limit), total: store.attendanceLogs.length, filtered: logs.length });
 });
 
 // ── Sync Log ───────────────────────────────────────────────────────

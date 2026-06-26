@@ -167,7 +167,9 @@ const SCHEMA = {
   attendance: {
     label: 'Attendance Page',
     items: {
-      btn_fetch:        { label: 'Button: Fetch from Devices', hint: 'Pull attendance from TCP devices' },
+      date_range:       { label: 'Date Range Filter',      hint: 'Show From / To date inputs for filtering attendance fetch' },
+      btn_fetch:        { label: 'Button: Fetch TCP',      hint: 'Pull attendance from TCP devices' },
+      btn_fetch_adms:   { label: 'Button: Fetch ADMS',     hint: 'Pull historical attendance from ADMS device' },
       btn_push_laravel: { label: 'Button: Push to ERP',    hint: 'Send attendance records to ERP API' },
     }
   },
