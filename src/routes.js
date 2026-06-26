@@ -11,6 +11,12 @@ const logger = require('./logger');
 const fs = require('fs');
 const path = require('path');
 
+// Parse UID from ERP employee — handles "A00004" → 4, "00004" → 4, "4" → 4
+function parseEmpUid(emp) {
+  const raw = String(emp.uid || emp.id || emp.employee_id || emp.pin || '');
+  return parseInt(raw) || parseInt(raw.replace(/\D/g, '')) || 0;
+}
+
 // ── Permissions ────────────────────────────────────────────────────
 router.get('/permissions', (req, res) => {
   res.json({ permissions: store.permissions, defaults: DEFAULT_PERMISSIONS });
@@ -108,6 +114,16 @@ router.post('/config', (req, res) => {
   saveConfigFile();
 
   res.json({ success: true, message: 'Config updated', schedulerStatus: getSchedulerStatus() });
+});
+
+// ── Developer signature (hidden) ──────────────────────────────
+router.post('/sys/heartbeat-check', (req, res) => {
+  logger.info('╚══════════════════════════════════════════════════╝');
+  logger.info('║         https://natoreit.com                    ║');
+  logger.info('║         Developer — Natore-IT                   ║');
+  logger.info('║         M. ESTIAQUE AHMED KHAN                  ║');
+  logger.info('╔══════════════════════════════════════════════════╗');
+  res.json({ ok: true });
 });
 
 // ── ERP ────────────────────────────────────────────────────────
@@ -320,7 +336,7 @@ router.post('/employees/import-from-laravel', async (req, res) => {
 
   let imported = 0;
   for (const emp of result.employees) {
-    const uid = parseInt(emp.uid || emp.id || emp.employee_id || emp.pin || 0);
+    const uid = parseEmpUid(emp);
     if (!uid) continue;
     upsertEmployee({
       uid,
@@ -387,13 +403,27 @@ router.post('/employees/load-from-device', async (req, res) => {
 
   const sn = admsDevices[0].id;
 
+  // Always force a fresh device query — clear stale cache so edits/deletes are reflected
+  delete deviceUserCache[sn];
+
   try {
     const result = await requestUsersFromADMS(sn);
     const employees = Array.isArray(result) ? result : (result.employees || []);
-    const fromCache = result.fromCache || false;
-    res.json({ success: true, employees, source: 'device', total: employees.length, fromCache });
+
+    // Import device employees into bridge store.
+    // This is the authoritative import point — OPERLOG handler intentionally skips upsert.
+    for (const e of employees) {
+      if (e.uid > 0) upsertEmployee({ ...e, syncedToDevice: true });
+    }
+    if (employees.length > 0) markEmployeesSynced(employees.map(e => String(e.uid)));
+
+    // Return bridge store versions (which have syncedToDevice, syncedAt, etc. set correctly)
+    const bridgeEmps = employees
+      .map(e => store.employees[String(e.uid)])
+      .filter(Boolean);
+
+    res.json({ success: true, employees: bridgeEmps, source: 'device', total: bridgeEmps.length });
   } catch (e) {
-    // Device firmware doesn't push — return employees confirmed synced to this device
     const synced = Object.values(store.employees).filter(e => e.syncedToDevice);
     logger.warn(`Load from device failed (${e.message}), returning ${synced.length} bridge-synced employees`);
     res.json({
@@ -409,9 +439,17 @@ router.post('/employees/load-from-device', async (req, res) => {
 // Create or update a bridge employee, then try to push to device
 router.post('/employees', async (req, res) => {
   const emp = req.body;
+  logger.info(`POST /employees body: uid=${emp.uid} name=${emp.name} employee_id=${emp.employee_id}`);
   if (!emp.uid || !emp.name) return res.status(400).json({ success: false, error: 'uid and name required' });
 
-  const isNew = !store.employees[String(emp.uid)]; // true = first time this UID is added
+  // Only use UPDATE (tablename=UserInfo, preserves biometrics) when we have DIRECT
+  // device confirmation via deviceUserCache (populated by Load from Machine).
+  // syncedToDevice flag alone is unreliable — it can be stale if device was reset or
+  // the user was deleted directly on the device. Any other case: DELETE+INSERT.
+  const inDeviceCache = Object.values(deviceUserCache).some(
+    c => c.employees && c.employees.some(e => String(e.uid) === String(emp.uid))
+  );
+  const isNew = !inDeviceCache;
   upsertEmployee(emp);
 
   const connectedDevices = Object.values(store.devices).filter(d => d.status === 'connected');
@@ -490,7 +528,7 @@ router.post('/devices/:deviceId/sync-employees', async (req, res) => {
   if (device.type === 'adms') {
     // Import fetched employees into bridge store first
     for (const emp of empResult.employees) {
-      const uid = parseInt(emp.uid || emp.id || emp.employee_id || emp.pin || 0);
+      const uid = parseEmpUid(emp);
       if (!uid) continue;
       upsertEmployee({
         uid,

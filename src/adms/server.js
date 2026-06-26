@@ -27,24 +27,24 @@ function clearQueue(sn) {
   delete deviceCommandQueue[sn];
 }
 
-// Build commands per employee.
-// isNew=true  → DELETE (ignoreError) + INSERT  (new user, no biometrics to preserve)
-// isNew=false → UPDATE only using tablename= form (preserves fingerprint/face on device)
-function buildUpsertCommands(empsToSync, isNew = false) {
+// Build UPDATE commands for employees.
+// Always tries DATA UPDATE tablename=UserInfo first (preserves biometrics).
+// If device returns -1004 (user doesn't exist yet), the devicecmd handler
+// automatically falls back to DELETE+INSERT for that specific employee.
+function buildUpsertCommands(empsToSync) {
   const commands = [];
   for (const e of empsToSync) {
     const pin  = String(e.employee_id || e.employeeId || e.uid || '');
     const name = (e.name || '').slice(0, 24).replace(/[&=\r\n\t]/g, ' ');
     const pri  = e.privilege || 0;
     const pass = e.password || '';
-    if (isNew) {
-      // DELETE first so a stale entry doesn't block the INSERT
-      commands.push({ id: cmdSerial++, cmd: `DATA DELETE UserInfo PIN=${pin}`, ignoreError: true });
-      commands.push({ id: cmdSerial++, cmd: `DATA UPDATE UserInfo PIN=${pin}\tName=${name}\tPri=${pri}\tPasswd=${pass}\tCard=0\tGrp=1\tTZ=0000111100000000\tVerify=0\tViceCard=0` });
-    } else {
-      // Update name/privilege only — biometrics (fingerprint/face) are untouched
-      commands.push({ id: cmdSerial++, cmd: `DATA UPDATE tablename=UserInfo PIN=${pin}\tName=${name}\tPri=${pri}\tPasswd=${pass}\tCard=0\tGrp=1\tTZ=0000111100000000\tVerify=0\tViceCard=0` });
-    }
+    // Use the exact field format the device itself sends in OPERLOG USER records.
+    // Mismatched fields (TZ, Verify, Card) may cause the device to silently ignore name updates.
+    commands.push({
+      id: cmdSerial++,
+      cmd: `DATA UPDATE tablename=UserInfo PIN=${pin}\tName=${name}\tPri=${pri}\tPasswd=${pass}\tCard=\tGrp=1\tTZ=0000000000000000\tVerify=-1\tViceCard=\tStartDatetime=0\tEndDatetime=0`,
+      emp: e,
+    });
   }
   return commands;
 }
@@ -86,16 +86,16 @@ function requestUsersFromADMS(sn) {
 }
 
 // empList: explicit list override (used by push-to-devices for filtered unsynced employees)
-function requestSetUserOnADMS(sn, emp, isNew = false, empList = null) {
+function requestSetUserOnADMS(sn, emp, _isNew = false, empList = null) {
   return new Promise((resolve, reject) => {
     const empsToSync = empList || (emp ? [emp] : Object.values(store.employees));
     if (!empsToSync.length) { resolve([]); return; }
 
-    const commands = buildUpsertCommands(empsToSync, isNew);
+    const commands = buildUpsertCommands(empsToSync);
 
     const key = `set-${sn}`;
     const lastId = commands[commands.length - 1].id;
-    commands.forEach(c => { cmdOwnership[c.id] = { key, isLast: c.id === lastId, ignoreError: c.ignoreError || false }; });
+    commands.forEach(c => { cmdOwnership[c.id] = { key, isLast: c.id === lastId, ignoreError: c.ignoreError || false, emp: c.emp }; });
 
     const timer = setTimeout(() => {
       delete pendingUserRequests[key];
@@ -370,14 +370,12 @@ function startADMSServer(port) {
               delete cache.resolveTimer;
               cache.receivedAt = Date.now();
 
-              const { upsertEmployee, markEmployeesSynced } = require('../store');
               const valid = cache.employees.filter(e => e.uid > 0);
-              for (const e of valid) upsertEmployee(e);
-              markEmployeesSynced(valid.map(e => String(e.uid)));
-              emit('state_update', { type: 'employees' });
+              logger.info(`ADMS ${sn} user collection complete: ${valid.length} users from OPERLOG`);
 
-              logger.info(`ADMS ${sn} user collection complete: ${valid.length} users saved from OPERLOG`);
-
+              // Resolve the pending load-from-device promise.
+              // Intentionally NOT calling upsertEmployee here — the route does that
+              // explicitly so it can control overwrite behaviour and avoid stale re-imports.
               const pending = pendingUserRequests[sn];
               if (pending) {
                 clearTimeout(pending.timer);
@@ -539,9 +537,28 @@ function startADMSServer(port) {
         } else if (returnCode < 0) {
           const ownership = cmdOwnership[cmdId];
           if (ownership?.ignoreError) {
-            // Expected failure (e.g. DELETE of non-existent user) — just continue
             logger.info(`ADMS cmd ${cmdId} failed with ${returnCode} (ignored — continuing queue)`);
             delete cmdOwnership[cmdId];
+          } else if (returnCode === -1004 && ownership?.emp) {
+            // UPDATE tablename=UserInfo failed — user doesn't exist on device yet.
+            // Fall back to DELETE+INSERT so the employee is created without losing
+            // any other employees' biometrics.
+            const e = ownership.emp;
+            const pin  = String(e.employee_id || e.employeeId || e.uid || '');
+            const name = (e.name || '').slice(0, 24).replace(/[&=\r\n\t]/g, ' ');
+            const pri  = e.privilege || 0;
+            const pass = e.password || '';
+            const delId = cmdSerial++;
+            const insId = cmdSerial++;
+            const key = ownership.key;
+            cmdOwnership[delId] = { key, isLast: false, ignoreError: true };
+            cmdOwnership[insId] = { key, isLast: true };
+            enqueue(sn2, [
+              { id: delId, cmd: `DATA DELETE UserInfo PIN=${pin}` },
+              { id: insId, cmd: `DATA UPDATE UserInfo PIN=${pin}\tName=${name}\tPri=${pri}\tPasswd=${pass}\tCard=0\tGrp=1\tTZ=0000111100000000\tVerify=0\tViceCard=0` },
+            ]);
+            delete cmdOwnership[cmdId];
+            logger.info(`ADMS cmd ${cmdId} UPDATE -1004 — falling back to DELETE+INSERT for PIN=${pin}`);
           } else {
             const key = ownership?.key;
             const candidates = key

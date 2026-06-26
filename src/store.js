@@ -13,6 +13,7 @@ const DEFAULT_PERMISSIONS = {
   employees: {
     btn_load_laravel: true, btn_load_machine: true,
     btn_set_device: true, btn_add_employee: true,
+    btn_edit_employee: true, btn_delete_employee: true,
     export_csv: true, export_dat: true,
     card_export_guide: true, card_api_docs: true,
   },

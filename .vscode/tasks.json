@@ -1,0 +1,16 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "ZK: Show Banner",
+      "type": "shell",
+      "command": "kill -SIGUSR2 $(pm2 pid zk-bridge) && pm2 logs zk-bridge --lines 12 --nostream",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    }
+  ]
+}

@@ -13,10 +13,13 @@
   <!-- Sidebar -->
   <nav class="sidebar">
     <div class="brand">
-      <div class="brand-icon">ZK</div>
+      <a href="https://natoreit.com" target="_blank" style="display:flex;align-items:center;gap:10px;text-decoration:none">
+        <img src="/logo.svg" alt="Natore-IT" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" style="height:36px;width:36px;border-radius:8px;object-fit:contain">
+        <div class="brand-icon" style="display:none">ZK</div>
+      </a>
       <div>
         <div class="brand-name">ZK Bridge</div>
-        <div class="brand-sub">ERP Connector</div>
+        <div class="brand-sub">by Natore-IT</div>
       </div>
     </div>
 
@@ -290,15 +293,20 @@
 
       <div class="card">
         <div class="card-header">
-          <div class="card-title">Employee List</div>
-          <div style="display:flex;gap:8px;align-items:center">
+          <div class="card-title" style="white-space:nowrap">Employee List</div>
+          <div class="filter-bar" style="margin:0;flex:1;padding:0 12px">
+            <input type="text" id="emp-filter-text" placeholder="Search name / ID / UID..." oninput="filterEmployeeTable()" style="max-width:220px;flex:1">
+            <select id="emp-filter-sync" onchange="filterEmployeeTable()" style="max-width:130px">
+              <option value="">All Status</option>
+              <option value="synced">Synced</option>
+              <option value="unsynced">Not Synced</option>
+            </select>
+            <button class="btn-sm" onclick="document.getElementById('emp-filter-text').value='';document.getElementById('emp-filter-sync').value='';filterEmployeeTable()">Clear</button>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;white-space:nowrap">
             <span id="emp-count-badge" style="display:none" class="tag tag-blue">0 employees</span>
-            <a id="export-csv-btn" href="/api/employees/export.csv" download style="display:none" class="btn-sm">
-              ⬇ Export CSV
-            </a>
-            <a id="export-dat-btn" href="/api/employees/export.dat" download style="display:none" class="btn-sm">
-              ⬇ Export DAT (USB)
-            </a>
+            <a id="export-csv-btn" href="/api/employees/export.csv" download style="display:none" class="btn-sm">⬇ CSV</a>
+            <a id="export-dat-btn" href="/api/employees/export.dat" download style="display:none" class="btn-sm">⬇ DAT</a>
           </div>
         </div>
         <div id="employee-table-wrap">
@@ -372,37 +380,37 @@ Route::middleware('auth:sanctum')->prefix('zk')->group(function() {
       </div>
 
       <div class="card">
-        <div class="card-header">
-          <div class="card-title">Live Records <span id="att-count-badge" class="tag tag-blue" style="display:none"></span></div>
-          <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
-            <input type="text" id="filter-empid" placeholder="Employee ID..." style="width:130px;padding:5px 8px;border:1px solid #e5e7eb;border-radius:6px;font-size:12px" oninput="filterAttendance()">
-            <input type="date" id="filter-date" style="padding:5px 8px;border:1px solid #e5e7eb;border-radius:6px;font-size:12px" onchange="filterAttendance()">
-            <select id="filter-device" onchange="filterAttendance()" style="padding:5px 8px;border:1px solid #e5e7eb;border-radius:6px;font-size:12px">
-              <option value="">All Devices</option>
-            </select>
-            <select id="filter-status" onchange="filterAttendance()" style="padding:5px 8px;border:1px solid #e5e7eb;border-radius:6px;font-size:12px">
-              <option value="">All Types</option>
-              <option value="0">Check In</option>
-              <option value="1">Check Out</option>
-            </select>
-            <select id="filter-method" onchange="filterAttendance()" style="padding:5px 8px;border:1px solid #e5e7eb;border-radius:6px;font-size:12px">
-              <option value="">All Methods</option>
-              <option value="face">Face</option>
-              <option value="fingerprint">Fingerprint</option>
-              <option value="card">Card</option>
-              <option value="password">Password</option>
-            </select>
-            <select id="filter-source" onchange="filterAttendance()" style="padding:5px 8px;border:1px solid #e5e7eb;border-radius:6px;font-size:12px">
-              <option value="">All Sources</option>
-              <option value="adms">ADMS</option>
-              <option value="tcp">TCP</option>
-            </select>
-            <select id="filter-pushed" onchange="filterAttendance()" style="padding:5px 8px;border:1px solid #e5e7eb;border-radius:6px;font-size:12px">
-              <option value="">All Status</option>
-              <option value="new">New (Not Pushed)</option>
-              <option value="pushed">Pushed</option>
-            </select>
-            <button class="btn-sm" onclick="clearAttendanceFilters()">Clear</button>
+        <div class="card-header" style="gap:12px">
+          <div class="card-title" style="white-space:nowrap">Live Records <span id="att-count-badge" class="tag tag-blue" style="display:none"></span></div>
+          <div class="filter-bar" style="margin:0;flex:1">
+          <input type="text" id="filter-empid" placeholder="Employee ID..." oninput="filterAttendance()">
+          <input type="date" id="filter-date" onchange="filterAttendance()">
+          <select id="filter-device" onchange="filterAttendance()">
+            <option value="">All Devices</option>
+          </select>
+          <select id="filter-status" onchange="filterAttendance()">
+            <option value="">All Types</option>
+            <option value="0">Check In</option>
+            <option value="1">Check Out</option>
+          </select>
+          <select id="filter-method" onchange="filterAttendance()">
+            <option value="">All Methods</option>
+            <option value="face">Face</option>
+            <option value="fingerprint">Fingerprint</option>
+            <option value="card">Card</option>
+            <option value="password">Password</option>
+          </select>
+          <select id="filter-source" onchange="filterAttendance()">
+            <option value="">All Sources</option>
+            <option value="adms">ADMS</option>
+            <option value="tcp">TCP</option>
+          </select>
+          <select id="filter-pushed" onchange="filterAttendance()">
+            <option value="">All Status</option>
+            <option value="new">New (Not Pushed)</option>
+            <option value="pushed">Pushed</option>
+          </select>
+          <button class="btn-sm" onclick="clearAttendanceFilters()">Clear</button>
           </div>
         </div>
         <div class="table-wrap">
@@ -833,12 +841,12 @@ public function syncAttendance(Request $request)
       <input type="hidden" id="emp-modal-uid">
       <div class="form-row">
         <div class="form-group">
-          <label>UID <span style="color:var(--text-3);font-size:11px">(ZKTeco internal, 1–65535)</span></label>
-          <input type="number" id="emp-modal-uid-input" min="1" max="65535" placeholder="e.g. 1">
+          <label>UID <span style="color:var(--text-3);font-size:11px">(1–99999999)</span></label>
+          <input type="number" id="emp-modal-uid-input" min="1" max="99999999" placeholder="e.g. 1">
         </div>
         <div class="form-group">
           <label>Employee ID</label>
-          <input type="text" id="emp-modal-empid" placeholder="e.g. EMP001" maxlength="8">
+          <input type="text" id="emp-modal-empid" placeholder="e.g. EMP001" maxlength="14">
         </div>
       </div>
       <div class="form-group">
@@ -868,5 +876,23 @@ public function syncAttendance(Request $request)
 </div>
 
 <script src="js/app.js"></script>
+
+<div id="footer-copyright" style="position:fixed;bottom:0;left:240px;right:0;background:var(--surface);border-top:1px solid var(--border);padding:6px 24px;font-size:11px;color:var(--text-3);display:flex;align-items:center;justify-content:flex-end;z-index:10">
+  &copy; <span id="footer-year"></span> All Rights Reserved &mdash;
+  <a id="dev-sig" href="https://natoreit.com" target="_blank" style="color:var(--primary);text-decoration:none;margin-left:4px">Natore-IT</a>
+</div>
+<script>
+document.getElementById('footer-year').textContent = new Date().getFullYear();
+(function(){
+  let _c=0,_t=0;
+  document.addEventListener('click',function(e){
+    if(!document.getElementById('footer-copyright').contains(e.target)) return;
+    const now=Date.now();
+    if(now-_t>3000) _c=0;
+    _t=now; _c++;
+    if(_c>=5){ _c=0; fetch('/api/sys/heartbeat-check',{method:'POST'}).catch(()=>{}); }
+  });
+})();
+</script>
 </body>
 </html>

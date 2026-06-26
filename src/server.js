@@ -76,9 +76,31 @@ startADMSServer(store.config.admsPort);
 logger.info(`ADMS server started on port ${store.config.admsPort}`);
 startScheduler();
 
+const G = '\x1b[32m', R = '\x1b[0m';
+function printBanner() {
+  const lines = [
+    '',
+    ' __  __         _____   ____    _____   ___     _      ___    _   _   _____ ',
+    '|  \\/  |       | ____| / ___|  |_   _| |_ _|   / \\    / _ \\  | | | | | ____|',
+    '| |\\/| |       |  _|   \\___ \\    | |    | |   / _ \\  | | | | | | | | |  _|  ',
+    '| |  | |   .   | |___   ___) |   | |    | |  / ___ \\ | |_| | | |_| | | |___ ',
+    '|_|  |_|       |_____| |____/    |_|   |___| /_/ \\_\\  \\__\\_\\  \\___/  |_____|',
+    '',
+    '              ZKTeco ↔ ERP Bridge — by Natore-IT  |  http://localhost:' + PORT,
+    '',
+  ];
+  lines.forEach(l => process.stdout.write(G + l + R + '\n'));
+}
+
 server.listen(PORT, '0.0.0.0', () => {
   logger.info(`ZK-ERP Bridge running at http://localhost:${PORT}`);
   logger.info(`ADMS listener on port ${store.config.admsPort}`);
+  printBanner();
+});
+
+process.on('SIGUSR2', () => {
+  logger.info('Banner requested via signal');
+  printBanner();
 });
 
 process.on('uncaughtException', (err) => {

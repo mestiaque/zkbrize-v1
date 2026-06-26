@@ -271,6 +271,8 @@ function renderAttendanceTable() {
 
 function filterAttendance() { renderAttendanceTable(); }
 
+function filterEmployeeTable() { renderMachineEmployeeTable(); }
+
 function clearAttendanceFilters() {
   ['filter-empid','filter-date','filter-device','filter-status','filter-method','filter-source','filter-pushed']
     .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
@@ -479,6 +481,27 @@ function renderMachineEmployeeTable() {
     wrap.innerHTML = '<div class="empty-state">No employees yet. Click "+ Add Employee" to create one — it will sync to all connected devices.</div>';
     return;
   }
+
+  const q = (document.getElementById('emp-filter-text')?.value || '').toLowerCase();
+  const syncFilter = document.getElementById('emp-filter-sync')?.value || '';
+
+  const filtered = machineEmployees.filter((e, _i) => {
+    if (q) {
+      const name = (e.name || '').toLowerCase();
+      const empid = (e.employee_id || e.employeeId || '').toLowerCase();
+      const uid = String(e.uid);
+      if (!name.includes(q) && !empid.includes(q) && !uid.includes(q)) return false;
+    }
+    if (syncFilter === 'synced' && !e.syncedToDevice) return false;
+    if (syncFilter === 'unsynced' && e.syncedToDevice) return false;
+    return true;
+  });
+
+  if (!filtered.length) {
+    wrap.innerHTML = '<div class="empty-state">No employees match the filter.</div>';
+    return;
+  }
+
   wrap.innerHTML = `
     <div class="table-wrap">
       <table class="data-table">
@@ -486,7 +509,8 @@ function renderMachineEmployeeTable() {
           <th>#</th><th>UID</th><th>Employee ID</th><th>Name</th><th>Role</th><th>Device Sync</th><th>Actions</th>
         </tr></thead>
         <tbody>
-          ${machineEmployees.map((e, i) => {
+          ${filtered.map((e, i) => {
+            const realIdx = machineEmployees.indexOf(e);
             const synced = e.syncedToDevice;
             const syncBadge = synced
               ? `<span class="tag tag-green" title="Synced at ${e.syncedAt ? new Date(e.syncedAt).toLocaleString() : ''}">✓ Synced</span>`
@@ -501,8 +525,8 @@ function renderMachineEmployeeTable() {
               <td>${syncBadge}</td>
               <td>
                 <div class="device-actions">
-                  <button class="btn-sm" onclick="openEmployeeModal(${i})">Edit</button>
-                  <button class="btn-sm" style="color:var(--red)" onclick="deleteBridgeEmployee(${e.uid})">Delete</button>
+                  ${perm('employees','btn_edit_employee') ? `<button class="btn-sm" onclick="openEmployeeModal(${realIdx})">Edit</button>` : ''}
+                  ${perm('employees','btn_delete_employee') ? `<button class="btn-sm" style="color:var(--red)" onclick="deleteBridgeEmployee(${e.uid})">Delete</button>` : ''}
                 </div>
               </td>
             </tr>`;
@@ -518,16 +542,11 @@ function openEmployeeModal(index) {
 
   document.getElementById('emp-modal-title').textContent = isEdit ? 'Edit Employee' : 'Add Employee';
 
-  // Auto-fill UID for new employees
-  const nextUid = isEdit ? emp.uid : (machineEmployees.reduce((max, e) => Math.max(max, e.uid || 0), 0) + 1);
-  document.getElementById('emp-modal-uid-input').value = nextUid;
-  document.getElementById('emp-modal-uid-input').disabled = isEdit; // locked during edit
+  document.getElementById('emp-modal-uid-input').value = isEdit ? emp.uid : '';
+  document.getElementById('emp-modal-uid-input').disabled = isEdit;
 
-  // Employee ID: auto-fill from emp or match UID for new
-  document.getElementById('emp-modal-empid').value = isEdit
-    ? (emp.employee_id || emp.employeeId || '')
-    : String(nextUid);
-  document.getElementById('emp-modal-empid').disabled = isEdit; // locked during edit
+  document.getElementById('emp-modal-empid').value = isEdit ? (emp.employee_id || emp.employeeId || '') : '';
+  document.getElementById('emp-modal-empid').disabled = isEdit;
 
   document.getElementById('emp-modal-name').value = emp ? (emp.name || '') : '';
   document.getElementById('emp-modal-password').value = emp ? (emp.password || '') : '';
@@ -544,7 +563,7 @@ async function saveEmployeeToMachine() {
   const privilege = parseInt(document.getElementById('emp-modal-privilege').value);
   const errEl = document.getElementById('emp-modal-error');
 
-  if (!uid || uid < 1 || uid > 65535) { errEl.textContent = 'UID must be between 1 and 65535'; errEl.style.display = ''; return; }
+  if (!uid || uid < 1 || uid > 99999999) { errEl.textContent = 'UID must be between 1 and 99999999'; errEl.style.display = ''; return; }
   if (!name) { errEl.textContent = 'Name is required'; errEl.style.display = ''; return; }
   errEl.style.display = 'none';
 
@@ -901,10 +920,13 @@ const PERM_SELECTORS = {
   'attendance.btn_push_laravel': '#btn-push-laravel',
 };
 
+let currentPermissions = {};
+
 async function applyPermissions() {
   try {
     const res = await fetch('/api/permissions');
     const { permissions } = await res.json();
+    currentPermissions = permissions || {};
     for (const [permKey, selector] of Object.entries(PERM_SELECTORS)) {
       const [section, key] = permKey.split('.');
       const allowed = permissions?.[section]?.[key] !== false;
@@ -913,6 +935,10 @@ async function applyPermissions() {
       });
     }
   } catch (e) { console.warn('Could not load permissions', e); }
+}
+
+function perm(section, key) {
+  return currentPermissions?.[section]?.[key] !== false;
 }
 
 async function loadCurrentUser() {

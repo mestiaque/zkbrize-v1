@@ -176,3 +176,11 @@ zk-bridge/
 ├── logs/                  # Auto-created
 └── README.md
 ```
+
+---
+
+## Developer
+
+**M. Estiaque Ahmed Khan**
+Company: [Natore-IT](https://natoreit.com)
+> Built and maintained by Natore-IT. All rights reserved © 2026.
