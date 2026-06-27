@@ -1,0 +1,31 @@
+{
+  "nav": {
+    "dashboard": true,
+    "devices": true,
+    "employees": true,
+    "attendance": true,
+    "logs": true,
+    "settings": true,
+    "guide": false
+  },
+  "employees": {
+    "btn_load_laravel": true,
+    "btn_load_machine": true,
+    "btn_set_device": true,
+    "btn_add_employee": true,
+    "export_csv": true,
+    "export_dat": true,
+    "card_export_guide": false,
+    "card_api_docs": false,
+    "btn_edit_employee": false
+  },
+  "devices": {
+    "card_add_tcp": true,
+    "card_adms_info": true,
+    "card_ping_test": true
+  },
+  "attendance": {
+    "btn_fetch": false,
+    "btn_push_laravel": true
+  }
+}

@@ -1,0 +1,550 @@
+[2026-06-26 18:06:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:06:00] INFO: Attendance sync: no new records to push
+[2026-06-26 18:06:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:06:00] INFO: Attendance sync: no new records to push
+[2026-06-26 18:08:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:08:00] INFO: Attendance sync: no new records to push
+[2026-06-26 18:08:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:08:00] INFO: Attendance sync: no new records to push
+[2026-06-26 18:10:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:10:00] INFO: Attendance sync: no new records to push
+[2026-06-26 18:10:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:10:00] INFO: Attendance sync: no new records to push
+[2026-06-26 18:12:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:12:00] INFO: Attendance sync: no new records to push
+[2026-06-26 18:12:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:12:00] INFO: Attendance sync: no new records to push
+[2026-06-26 18:14:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:14:00] INFO: Attendance sync: no new records to push
+[2026-06-26 18:14:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:14:00] INFO: Attendance sync: no new records to push
+[2026-06-26 18:15:17] INFO: ADMS server started on port 5016
+[2026-06-26 18:15:17] INFO: Employee sync: DISABLED
+[2026-06-26 18:15:17] INFO: Attendance sync scheduled: */2 * * * *
+[2026-06-26 18:15:17] INFO: ADMS server listening on port 5016
+[2026-06-26 18:15:17] INFO: ZK-ERP Bridge running at http://localhost:3000
+[2026-06-26 18:15:17] INFO: ADMS listener on port 5016
+[2026-06-26 18:15:18] INFO: UI connected: PFMMR9dG0FBhbhGTAAAB
+[2026-06-26 18:15:21] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:15:21] INFO: ADMS device re-registered from heartbeat: SN=UDP3251601483 ip=192.168.110.101
+[2026-06-26 18:15:24] INFO: UI connected: zMoPSLMIE5Ws0X8FAAAD
+[2026-06-26 18:15:31] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:15:33] INFO: UI disconnected: zMoPSLMIE5Ws0X8FAAAD
+[2026-06-26 18:15:41] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:15:50] INFO: UI disconnected: PFMMR9dG0FBhbhGTAAAB
+[2026-06-26 18:15:50] INFO: UI connected: WwHyDks7nYmPnPwvAAAF
+[2026-06-26 18:15:50] INFO: UI disconnected: WwHyDks7nYmPnPwvAAAF
+[2026-06-26 18:15:50] INFO: UI connected: 1QnxIHmDNzpthFExAAAH
+[2026-06-26 18:15:51] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:15:51] INFO: UI disconnected: 1QnxIHmDNzpthFExAAAH
+[2026-06-26 18:15:51] INFO: UI connected: q-1ALhuGqP5koOBRAAAJ
+[2026-06-26 18:15:51] INFO: UI disconnected: q-1ALhuGqP5koOBRAAAJ
+[2026-06-26 18:15:51] INFO: UI connected: 4xHSkhf110U-MuIdAAAL
+[2026-06-26 18:15:51] INFO: UI disconnected: 4xHSkhf110U-MuIdAAAL
+[2026-06-26 18:15:52] INFO: UI connected: u7g9vwq1rSMBnpdPAAAN
+[2026-06-26 18:16:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:16:00] INFO: Attendance sync: no new records to push
+[2026-06-26 18:16:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:16:00] INFO: Attendance sync: no new records to push
+[2026-06-26 18:16:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:16:00] INFO: Attendance sync: no new records to push
+[2026-06-26 18:16:02] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:16:12] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:16:22] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:16:32] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:16:42] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:16:52] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:17:03] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:17:13] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:17:23] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:17:33] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:17:43] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:17:53] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:18:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:18:00] INFO: Attendance sync: no new records to push
+[2026-06-26 18:18:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:18:00] INFO: Attendance sync: no new records to push
+[2026-06-26 18:18:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:18:00] INFO: Attendance sync: no new records to push
+[2026-06-26 18:18:04] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:18:14] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:18:23] INFO: UI disconnected: u7g9vwq1rSMBnpdPAAAN
+[2026-06-26 18:18:23] INFO: UI connected: fiVkHKHlmpT7vXPuAAAP
+[2026-06-26 18:18:24] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:18:34] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:18:44] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:18:54] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:19:05] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:19:15] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:19:25] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:19:35] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:19:45] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:19:55] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:20:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:20:00] INFO: Attendance sync: no new records to push
+[2026-06-26 18:20:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:20:00] INFO: Attendance sync: no new records to push
+[2026-06-26 18:20:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:20:00] INFO: Attendance sync: no new records to push
+[2026-06-26 18:20:06] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:20:09] INFO: UI disconnected: fiVkHKHlmpT7vXPuAAAP
+[2026-06-26 18:20:09] INFO: UI connected: 3PLS2JvpPbOsHnA2AAAR
+[2026-06-26 18:20:12] INFO: UI disconnected: 3PLS2JvpPbOsHnA2AAAR
+[2026-06-26 18:20:12] INFO: UI connected: b8tC-300nZIatkivAAAT
+[2026-06-26 18:20:16] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:20:26] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:20:36] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:20:46] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:20:56] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:21:07] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:21:17] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:21:27] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:21:37] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:21:47] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:21:57] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:22:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:22:00] INFO: Attendance sync: no new records to push
+[2026-06-26 18:22:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:22:00] INFO: Attendance sync: no new records to push
+[2026-06-26 18:22:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:22:00] INFO: Attendance sync: no new records to push
+[2026-06-26 18:22:08] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:22:18] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:22:28] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:22:38] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:22:46] INFO: UI disconnected: b8tC-300nZIatkivAAAT
+[2026-06-26 18:22:46] INFO: UI connected: kKjp3exzSC5TcwzUAAAV
+[2026-06-26 18:22:46] INFO: UI disconnected: kKjp3exzSC5TcwzUAAAV
+[2026-06-26 18:22:47] INFO: UI connected: uZOzyw3K8tphn3JKAAAX
+[2026-06-26 18:22:47] INFO: UI disconnected: uZOzyw3K8tphn3JKAAAX
+[2026-06-26 18:22:47] INFO: UI connected: 8RGFkqAiWcSpw3_iAAAZ
+[2026-06-26 18:22:47] INFO: UI disconnected: 8RGFkqAiWcSpw3_iAAAZ
+[2026-06-26 18:22:47] INFO: UI connected: Lq04kRsnS-fujIbjAAAb
+[2026-06-26 18:22:47] INFO: UI connected: 8dOnBPvMdVvqr0MiAAAd
+[2026-06-26 18:22:48] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:22:58] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:23:09] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:23:19] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:23:29] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:23:32] INFO: UI disconnected: Lq04kRsnS-fujIbjAAAb
+[2026-06-26 18:23:39] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:23:49] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:23:52] INFO: UI disconnected: 8dOnBPvMdVvqr0MiAAAd
+[2026-06-26 18:23:52] INFO: UI connected: r3I3R6zrT0O2QptFAAAf
+[2026-06-26 18:23:59] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:24:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:24:00] INFO: Attendance sync: no new records to push
+[2026-06-26 18:24:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:24:00] INFO: Attendance sync: no new records to push
+[2026-06-26 18:24:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:24:00] INFO: Attendance sync: no new records to push
+[2026-06-26 18:24:10] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:24:20] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:24:30] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:24:40] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:24:50] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:25:00] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:25:11] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:25:21] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:25:31] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:25:37] INFO: UI disconnected: r3I3R6zrT0O2QptFAAAf
+[2026-06-26 18:25:37] INFO: UI connected: M3ND0B_ilEp6m3t4AAAh
+[2026-06-26 18:25:41] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:25:43] INFO: UI disconnected: M3ND0B_ilEp6m3t4AAAh
+[2026-06-26 18:25:51] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:26:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:26:00] INFO: Attendance sync: no new records to push
+[2026-06-26 18:26:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:26:00] INFO: Attendance sync: no new records to push
+[2026-06-26 18:26:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:26:00] INFO: Attendance sync: no new records to push
+[2026-06-26 18:26:02] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:26:12] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:26:22] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:26:27] INFO: UI connected: WBXZVaLKSHRieCq4AAAj
+[2026-06-26 18:26:30] INFO: UI disconnected: WBXZVaLKSHRieCq4AAAj
+[2026-06-26 18:26:32] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:26:42] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:26:52] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:27:03] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:27:13] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:27:23] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:27:33] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:27:43] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:27:53] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:28:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:28:00] INFO: Attendance sync: no new records to push
+[2026-06-26 18:28:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:28:00] INFO: Attendance sync: no new records to push
+[2026-06-26 18:28:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:28:00] INFO: Attendance sync: no new records to push
+[2026-06-26 18:28:04] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:28:14] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:28:24] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:28:34] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:28:44] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:28:54] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:29:03] INFO: ADMS server started on port 5016
+[2026-06-26 18:29:03] INFO: Employee sync: DISABLED
+[2026-06-26 18:29:03] INFO: Attendance sync scheduled: */2 * * * *
+[2026-06-26 18:29:03] INFO: ADMS server listening on port 5016
+[2026-06-26 18:29:03] INFO: ZK-ERP Bridge running at http://localhost:3000
+[2026-06-26 18:29:03] INFO: ADMS listener on port 5016
+[2026-06-26 18:29:05] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:29:05] INFO: ADMS device re-registered from heartbeat: SN=UDP3251601483 ip=192.168.110.101
+[2026-06-26 18:29:15] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:29:17] INFO: UI connected: SPS1Mt4rLhd5f7H_AAAB
+[2026-06-26 18:29:25] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:29:25] INFO: UI disconnected: SPS1Mt4rLhd5f7H_AAAB
+[2026-06-26 18:29:35] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:29:45] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:29:55] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:30:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:30:00] INFO: Attendance sync: no new records to push
+[2026-06-26 18:30:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:30:00] INFO: Attendance sync: no new records to push
+[2026-06-26 18:30:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:30:00] INFO: Attendance sync: no new records to push
+[2026-06-26 18:30:02] INFO: UI connected: OePRytuRztouAUh6AAAD
+[2026-06-26 18:30:06] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:30:16] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:30:26] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:30:36] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:30:44] INFO: UI disconnected: OePRytuRztouAUh6AAAD
+[2026-06-26 18:30:46] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:30:56] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:31:07] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:31:17] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:31:27] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:31:37] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:31:47] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:31:57] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:32:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:32:00] INFO: Attendance sync: no new records to push
+[2026-06-26 18:32:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:32:00] INFO: Attendance sync: no new records to push
+[2026-06-26 18:32:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:32:00] INFO: Attendance sync: no new records to push
+[2026-06-26 18:32:08] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:32:18] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:32:28] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:32:38] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:32:48] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:32:58] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:33:09] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:33:19] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:33:29] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:33:39] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:33:49] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:33:59] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:34:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:34:00] INFO: Attendance sync: no new records to push
+[2026-06-26 18:34:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:34:00] INFO: Attendance sync: no new records to push
+[2026-06-26 18:34:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:34:00] INFO: Attendance sync: no new records to push
+[2026-06-26 18:34:10] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:34:20] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:34:30] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:34:40] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:34:50] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:35:00] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:35:11] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:35:21] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:35:31] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:35:41] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:35:51] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:36:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:36:00] INFO: Attendance sync: no new records to push
+[2026-06-26 18:36:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:36:00] INFO: Attendance sync: no new records to push
+[2026-06-26 18:36:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:36:00] INFO: Attendance sync: no new records to push
+[2026-06-26 18:36:02] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:36:12] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:36:22] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:36:32] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:36:42] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:36:52] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:37:03] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:37:13] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:37:23] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:37:33] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:37:43] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:37:53] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:38:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:38:00] INFO: Attendance sync: no new records to push
+[2026-06-26 18:38:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:38:00] INFO: Attendance sync: no new records to push
+[2026-06-26 18:38:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:38:00] INFO: Attendance sync: no new records to push
+[2026-06-26 18:38:04] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:38:14] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:38:24] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:38:34] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:38:44] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:38:54] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:39:05] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:39:15] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:39:25] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:39:35] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:39:45] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:39:55] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:40:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:40:00] INFO: Attendance sync: no new records to push
+[2026-06-26 18:40:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:40:00] INFO: Attendance sync: no new records to push
+[2026-06-26 18:40:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:40:00] INFO: Attendance sync: no new records to push
+[2026-06-26 18:40:06] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:40:16] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:40:26] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:40:36] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:40:46] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:40:56] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:41:07] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:41:17] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:41:27] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:41:37] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:41:47] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:41:57] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:42:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:42:00] INFO: Attendance sync: no new records to push
+[2026-06-26 18:42:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:42:00] INFO: Attendance sync: no new records to push
+[2026-06-26 18:42:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:42:00] INFO: Attendance sync: no new records to push
+[2026-06-26 18:42:08] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:42:18] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:42:28] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:42:38] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:42:48] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:42:58] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:43:09] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:43:19] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:43:29] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:43:39] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:43:49] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:43:59] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:44:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:44:00] INFO: Attendance sync: no new records to push
+[2026-06-26 18:44:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:44:00] INFO: Attendance sync: no new records to push
+[2026-06-26 18:44:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:44:00] INFO: Attendance sync: no new records to push
+[2026-06-26 18:44:10] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:44:20] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:44:30] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:44:40] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:44:50] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:45:00] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:45:11] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:45:21] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:45:31] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:45:41] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:45:51] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:46:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:46:00] INFO: Attendance sync: no new records to push
+[2026-06-26 18:46:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:46:00] INFO: Attendance sync: no new records to push
+[2026-06-26 18:46:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:46:00] INFO: Attendance sync: no new records to push
+[2026-06-26 18:46:02] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:46:12] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:46:22] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:46:32] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:46:42] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:46:52] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:47:03] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:47:13] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:47:23] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:47:33] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:47:43] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:47:53] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:48:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:48:00] INFO: Attendance sync: no new records to push
+[2026-06-26 18:48:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:48:00] INFO: Attendance sync: no new records to push
+[2026-06-26 18:48:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:48:00] INFO: Attendance sync: no new records to push
+[2026-06-26 18:48:04] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:48:14] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:48:24] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:48:34] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:48:44] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:48:54] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:49:05] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:49:15] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:49:25] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:49:35] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:49:45] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:49:55] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:50:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:50:00] INFO: Attendance sync: no new records to push
+[2026-06-26 18:50:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:50:00] INFO: Attendance sync: no new records to push
+[2026-06-26 18:50:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:50:00] INFO: Attendance sync: no new records to push
+[2026-06-26 18:50:06] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:50:16] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:50:17] INFO: UI connected: 201dqBYtOWyjfWRZAAAF
+[2026-06-26 18:50:26] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:50:36] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:50:46] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:50:56] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:51:07] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:51:17] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:51:27] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:51:37] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:51:47] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:51:57] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:52:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:52:00] INFO: Attendance sync: no new records to push
+[2026-06-26 18:52:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:52:00] INFO: Attendance sync: no new records to push
+[2026-06-26 18:52:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:52:00] INFO: Attendance sync: no new records to push
+[2026-06-26 18:52:08] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:52:18] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:52:28] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:52:38] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:52:48] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:52:58] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:53:09] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:53:19] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:53:29] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:53:39] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:53:49] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:53:59] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:54:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:54:00] INFO: Attendance sync: no new records to push
+[2026-06-26 18:54:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:54:00] INFO: Attendance sync: no new records to push
+[2026-06-26 18:54:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:54:00] INFO: Attendance sync: no new records to push
+[2026-06-26 18:54:10] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:54:20] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:54:30] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:54:40] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:54:50] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:55:00] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:55:11] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:55:21] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:55:31] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:55:41] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:55:51] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:56:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:56:00] INFO: Attendance sync: no new records to push
+[2026-06-26 18:56:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:56:00] INFO: Attendance sync: no new records to push
+[2026-06-26 18:56:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:56:00] INFO: Attendance sync: no new records to push
+[2026-06-26 18:56:02] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:56:12] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:56:22] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:56:32] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:56:34] INFO: ADMS RAW POST /iclock/cdata?SN=UDP3251601483&table=OPERLOG&Stamp=9999 | headers.sn=- | body: OPLOG 4	20026	2026-06-26 18:56:34	20026	0	0	0
+
+[2026-06-26 18:56:34] INFO: ADMS POST SN=UDP3251601483 table=OPERLOG recordLines=1
+[2026-06-26 18:56:42] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:56:52] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:57:03] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-26 18:57:04] INFO: ADMS RAW POST /iclock/cdata?SN=UDP3251601483&table=OPERLOG&Stamp=9999 | headers.sn=- | body: OPLOG 82	20026	2026-06-26 18:57:04	add adms address	0	0	0
+
+[2026-06-26 18:57:04] INFO: ADMS POST SN=UDP3251601483 table=OPERLOG recordLines=1
+[2026-06-26 18:58:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:58:00] INFO: Attendance sync: no new records to push
+[2026-06-26 18:58:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:58:00] INFO: Attendance sync: no new records to push
+[2026-06-26 18:58:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 18:58:00] INFO: Attendance sync: no new records to push
+[2026-06-26 19:00:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 19:00:00] INFO: Attendance sync: no new records to push
+[2026-06-26 19:00:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 19:00:00] INFO: Attendance sync: no new records to push
+[2026-06-26 19:00:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 19:00:00] INFO: Attendance sync: no new records to push
+[2026-06-26 19:02:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 19:02:00] INFO: Attendance sync: no new records to push
+[2026-06-26 19:02:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 19:02:00] INFO: Attendance sync: no new records to push
+[2026-06-26 19:02:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 19:02:00] INFO: Attendance sync: no new records to push
+[2026-06-26 19:04:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 19:04:00] INFO: Attendance sync: no new records to push
+[2026-06-26 19:04:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 19:04:00] INFO: Attendance sync: no new records to push
+[2026-06-26 19:04:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 19:04:00] INFO: Attendance sync: no new records to push
+[2026-06-26 19:06:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 19:06:00] INFO: Attendance sync: no new records to push
+[2026-06-26 19:06:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 19:06:00] INFO: Attendance sync: no new records to push
+[2026-06-26 19:06:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 19:06:00] INFO: Attendance sync: no new records to push
+[2026-06-26 19:08:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 19:08:00] INFO: Attendance sync: no new records to push
+[2026-06-26 19:08:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 19:08:00] INFO: Attendance sync: no new records to push
+[2026-06-26 19:08:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 19:08:00] INFO: Attendance sync: no new records to push
+[2026-06-26 19:10:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 19:10:00] INFO: Attendance sync: no new records to push
+[2026-06-26 19:10:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 19:10:00] INFO: Attendance sync: no new records to push
+[2026-06-26 19:10:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 19:10:00] INFO: Attendance sync: no new records to push
+[2026-06-26 19:12:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 19:12:00] INFO: Attendance sync: no new records to push
+[2026-06-26 19:12:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 19:12:00] INFO: Attendance sync: no new records to push
+[2026-06-26 19:12:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 19:12:00] INFO: Attendance sync: no new records to push
+[2026-06-26 19:14:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 19:14:00] INFO: Attendance sync: no new records to push
+[2026-06-26 19:14:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 19:14:00] INFO: Attendance sync: no new records to push
+[2026-06-26 19:14:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 19:14:00] INFO: Attendance sync: no new records to push
+[2026-06-26 19:16:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 19:16:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 19:16:00] INFO: Attendance sync: no new records to push
+[2026-06-26 19:16:00] INFO: Attendance sync: no new records to push
+[2026-06-26 19:16:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-26 19:16:00] INFO: Attendance sync: no new records to push
+[2026-06-26 19:17:10] INFO: UI disconnected: 201dqBYtOWyjfWRZAAAF
+[2026-06-27 12:12:53] INFO: ADMS server started on port 5016
+[2026-06-27 12:12:53] INFO: Employee sync: DISABLED
+[2026-06-27 12:12:53] INFO: Attendance sync scheduled: */2 * * * *
+[2026-06-27 12:12:53] INFO: ADMS server listening on port 5016
+[2026-06-27 12:12:53] INFO: ZK-ERP Bridge running at http://localhost:3000
+[2026-06-27 12:12:53] INFO: ADMS listener on port 5016
+[2026-06-27 12:13:18] INFO: UI connected: Kudg-stP3ZlkTIpMAAAB
+[2026-06-27 12:14:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-27 12:14:00] INFO: Attendance sync: no new records to push
+[2026-06-27 12:16:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-27 12:16:00] INFO: Attendance sync: no new records to push
+[2026-06-27 12:18:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-27 12:18:00] INFO: Attendance sync: no new records to push
+[2026-06-27 12:20:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-27 12:20:00] INFO: Attendance sync: no new records to push
+[2026-06-27 12:22:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-27 12:22:00] INFO: Attendance sync: no new records to push
+[2026-06-27 12:24:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-27 12:24:00] INFO: Attendance sync: no new records to push
+[2026-06-27 12:26:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-27 12:26:00] INFO: Attendance sync: no new records to push
+[2026-06-27 12:28:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-27 12:28:00] INFO: Attendance sync: no new records to push
+[2026-06-27 12:30:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-27 12:30:00] INFO: Attendance sync: no new records to push
+[2026-06-27 12:32:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-27 12:32:00] INFO: Attendance sync: no new records to push
+[2026-06-27 12:34:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-27 12:34:00] INFO: Attendance sync: no new records to push
+[2026-06-27 12:36:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-27 12:36:00] INFO: Attendance sync: no new records to push
+[2026-06-27 12:38:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-27 12:38:00] INFO: Attendance sync: no new records to push
+[2026-06-27 12:40:00] INFO: Running scheduled attendance push to ERP...
+[2026-06-27 12:40:00] INFO: Attendance sync: no new records to push
