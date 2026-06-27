@@ -5,32 +5,131 @@
     "name": "Fatema Akter",
     "password": "",
     "privilege": 0,
-    "syncedToDevice": true,
-    "syncedAt": "2026-06-27T10:40:09.685Z",
-    "createdAt": "2026-06-27T10:39:29.967Z",
-    "updatedAt": "2026-06-27T10:39:29.967Z"
+    "syncedToDevice": false,
+    "syncedAt": null,
+    "createdAt": "2026-06-27T10:36:00.672Z",
+    "updatedAt": "2026-06-27T13:56:00.552Z"
+  },
+  "2": {
+    "uid": 2,
+    "employee_id": "EMP-0002",
+    "name": "Rina Begum",
+    "password": "",
+    "privilege": 0,
+    "syncedToDevice": false,
+    "syncedAt": null,
+    "createdAt": "2026-06-27T10:40:00.802Z",
+    "updatedAt": "2026-06-27T13:56:00.553Z"
+  },
+  "3": {
+    "uid": 3,
+    "employee_id": "EMP-0003",
+    "name": "Sumaiya Khatun",
+    "password": "",
+    "privilege": 0,
+    "syncedToDevice": false,
+    "syncedAt": null,
+    "createdAt": "2026-06-27T10:42:00.377Z",
+    "updatedAt": "2026-06-27T13:56:00.587Z"
   },
   "4": {
     "uid": 4,
-    "employee_id": "A00004",
-    "name": "EST",
+    "employee_id": "EMP-0004",
+    "name": "Morium Akter",
     "password": "",
     "privilege": 0,
     "syncedToDevice": true,
     "syncedAt": "2026-06-26T09:37:17.047Z",
     "createdAt": "2026-06-26T09:37:01.111Z",
-    "updatedAt": "2026-06-26T10:09:04.496Z"
+    "updatedAt": "2026-06-27T13:56:00.675Z"
   },
   "5": {
     "uid": 5,
-    "employee_id": "A00005",
-    "name": "Rashidul",
+    "employee_id": "EMP-0005",
+    "name": "Amena Khatun",
     "password": "",
     "privilege": 0,
     "syncedToDevice": true,
     "syncedAt": "2026-06-26T10:09:17.735Z",
     "createdAt": "2026-06-26T10:09:04.497Z",
-    "updatedAt": "2026-06-26T10:09:04.497Z"
+    "updatedAt": "2026-06-27T13:56:00.676Z"
+  },
+  "6": {
+    "uid": 6,
+    "employee_id": "EMP-0006",
+    "name": "Md. Rakibul Islam",
+    "password": "",
+    "privilege": 0,
+    "syncedToDevice": false,
+    "syncedAt": null,
+    "createdAt": "2026-06-27T10:42:00.421Z",
+    "updatedAt": "2026-06-27T13:56:00.719Z"
+  },
+  "7": {
+    "uid": 7,
+    "employee_id": "EMP-0007",
+    "name": "Md. Kamrul Hasan",
+    "password": "",
+    "privilege": 0,
+    "syncedToDevice": false,
+    "syncedAt": null,
+    "createdAt": "2026-06-27T10:42:00.422Z",
+    "updatedAt": "2026-06-27T13:56:00.719Z"
+  },
+  "8": {
+    "uid": 8,
+    "employee_id": "EMP-0008",
+    "name": "Md. Shahin Alam",
+    "password": "",
+    "privilege": 0,
+    "syncedToDevice": false,
+    "syncedAt": null,
+    "createdAt": "2026-06-27T10:42:00.423Z",
+    "updatedAt": "2026-06-27T13:56:00.761Z"
+  },
+  "9": {
+    "uid": 9,
+    "employee_id": "EMP-0009",
+    "name": "Nusrat Jahan",
+    "password": "",
+    "privilege": 0,
+    "syncedToDevice": false,
+    "syncedAt": null,
+    "createdAt": "2026-06-27T10:42:00.423Z",
+    "updatedAt": "2026-06-27T13:56:00.762Z"
+  },
+  "10": {
+    "uid": 10,
+    "employee_id": "EMP-0010",
+    "name": "Md. Rafiqul Islam",
+    "password": "",
+    "privilege": 0,
+    "syncedToDevice": false,
+    "syncedAt": null,
+    "createdAt": "2026-06-27T10:42:00.424Z",
+    "updatedAt": "2026-06-27T13:56:00.763Z"
+  },
+  "11": {
+    "uid": 11,
+    "employee_id": "EMP-0011",
+    "name": "Md. Kamal Hossain",
+    "password": "",
+    "privilege": 0,
+    "syncedToDevice": false,
+    "syncedAt": null,
+    "createdAt": "2026-06-27T10:42:00.424Z",
+    "updatedAt": "2026-06-27T13:56:00.763Z"
+  },
+  "12": {
+    "uid": 12,
+    "employee_id": "EMP-0012",
+    "name": "Mr. Rezaul Karim",
+    "password": "",
+    "privilege": 0,
+    "syncedToDevice": false,
+    "syncedAt": null,
+    "createdAt": "2026-06-27T10:42:00.424Z",
+    "updatedAt": "2026-06-27T13:56:00.764Z"
   },
   "101": {
     "uid": 101,
@@ -2076,18 +2175,6 @@
     "syncedToDevice": true,
     "syncedAt": "2026-06-27T10:26:05.980Z",
     "createdAt": "2026-06-27T10:05:00.828Z",
-    "updatedAt": "2026-06-27T10:40:00.903Z"
-  },
-  "EMP-0002": {
-    "uid": "EMP-0002",
-    "employee_id": "EMP-0002",
-    "name": "Rina Begum",
-    "privilege": 0,
-    "password": "",
-    "card": "",
-    "syncedToDevice": true,
-    "syncedAt": "2026-06-27T10:40:09.685Z",
-    "createdAt": "2026-06-27T10:40:00.903Z",
-    "updatedAt": "2026-06-27T10:40:00.903Z"
+    "updatedAt": "2026-06-27T10:34:00.402Z"
   }
 }
