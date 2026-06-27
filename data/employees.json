@@ -1,4 +1,15 @@
 {
+  "1": {
+    "uid": 1,
+    "employee_id": "EMP-0001",
+    "name": "Fatema Akter",
+    "password": "",
+    "privilege": 0,
+    "syncedToDevice": true,
+    "syncedAt": "2026-06-27T10:40:09.685Z",
+    "createdAt": "2026-06-27T10:39:29.967Z",
+    "updatedAt": "2026-06-27T10:39:29.967Z"
+  },
   "4": {
     "uid": 4,
     "employee_id": "A00004",
@@ -2054,5 +2065,29 @@
     "syncedAt": "2026-06-26T05:24:10.514Z",
     "createdAt": "2026-06-26T04:17:23.815Z",
     "updatedAt": "2026-06-26T05:24:01.969Z"
+  },
+  "EMP-0001": {
+    "uid": "EMP-0001",
+    "employee_id": "EMP-0001",
+    "name": "Fatema Akter",
+    "privilege": 0,
+    "password": "",
+    "card": "",
+    "syncedToDevice": true,
+    "syncedAt": "2026-06-27T10:26:05.980Z",
+    "createdAt": "2026-06-27T10:05:00.828Z",
+    "updatedAt": "2026-06-27T10:40:00.903Z"
+  },
+  "EMP-0002": {
+    "uid": "EMP-0002",
+    "employee_id": "EMP-0002",
+    "name": "Rina Begum",
+    "privilege": 0,
+    "password": "",
+    "card": "",
+    "syncedToDevice": true,
+    "syncedAt": "2026-06-27T10:40:09.685Z",
+    "createdAt": "2026-06-27T10:40:00.903Z",
+    "updatedAt": "2026-06-27T10:40:00.903Z"
   }
 }

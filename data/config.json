@@ -1,6 +1,6 @@
 {
-  "syncSchedule": "*/5 * * * *",
+  "syncSchedule": "*/2 * * * *",
   "attendanceFetchSchedule": "*/2 * * * *",
-  "employeeSyncEnabled": false,
+  "employeeSyncEnabled": true,
   "attendanceSyncEnabled": true
 }

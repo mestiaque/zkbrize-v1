@@ -47006,3 +47006,11 @@
 [2026-06-26 18:06:16] ERROR: Failed to push attendance: timeout of 15000ms exceeded
 [2026-06-26 18:06:16] ERROR: Failed to push attendance: timeout of 15000ms exceeded
 [2026-06-26 18:06:16] ERROR: Failed to push attendance: timeout of 15000ms exceeded
+[2026-06-27 16:16:46] ERROR: ADMS server error: listen EADDRINUSE: address already in use 0.0.0.0:5016
+[2026-06-27 16:16:46] ERROR: Uncaught exception: {"error":"listen EADDRINUSE: address already in use 0.0.0.0:3000","stack":"Error: listen EADDRINUSE: address already in use 0.0.0.0:3000\n    at Server.setupListenHandle [as _listen2] (node:net:1908:16)\n    at listenInCluster (node:net:1965:12)\n    at doListen (node:net:2139:7)\n    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)"}
+[2026-06-27 16:30:09] ERROR: ADMS server error: listen EADDRINUSE: address already in use 0.0.0.0:5016
+[2026-06-27 16:30:09] ERROR: Uncaught exception: {"error":"listen EADDRINUSE: address already in use 0.0.0.0:3000","stack":"Error: listen EADDRINUSE: address already in use 0.0.0.0:3000\n    at Server.setupListenHandle [as _listen2] (node:net:1908:16)\n    at listenInCluster (node:net:1965:12)\n    at doListen (node:net:2139:7)\n    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)"}
+[2026-06-27 16:32:56] ERROR: ADMS server error: listen EADDRINUSE: address already in use 0.0.0.0:5016
+[2026-06-27 16:32:56] ERROR: Uncaught exception: {"error":"listen EADDRINUSE: address already in use 0.0.0.0:3000","stack":"Error: listen EADDRINUSE: address already in use 0.0.0.0:3000\n    at Server.setupListenHandle [as _listen2] (node:net:1908:16)\n    at listenInCluster (node:net:1965:12)\n    at doListen (node:net:2139:7)\n    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)"}
+[2026-06-27 16:34:42] ERROR: ADMS server error: listen EADDRINUSE: address already in use 0.0.0.0:5016
+[2026-06-27 16:34:42] ERROR: Uncaught exception: {"error":"listen EADDRINUSE: address already in use 0.0.0.0:3000","stack":"Error: listen EADDRINUSE: address already in use 0.0.0.0:3000\n    at Server.setupListenHandle [as _listen2] (node:net:1908:16)\n    at listenInCluster (node:net:1965:12)\n    at doListen (node:net:2139:7)\n    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)"}

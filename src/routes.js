@@ -11,7 +11,6 @@ const logger = require('./logger');
 const fs = require('fs');
 const path = require('path');
 
-// Parse UID from ERP employee — handles "A00004" → 4, "00004" → 4, "4" → 4
 function parseEmpUid(emp) {
   const raw = String(emp.uid || emp.id || emp.employee_id || emp.pin || '');
   return parseInt(raw) || parseInt(raw.replace(/\D/g, '')) || 0;
@@ -348,13 +347,12 @@ router.post('/employees/import-from-laravel', async (req, res) => {
     upsertEmployee({
       uid,
       employee_id: String(emp.employee_id || emp.pin || emp.card_no || uid),
-      name: emp.name || emp.first_name && (emp.first_name + (emp.last_name ? ' ' + emp.last_name : '')) || '',
+      name: emp.name || (emp.first_name ? (emp.first_name + (emp.last_name ? ' ' + emp.last_name : '')) : '') || '',
       password: emp.password || '',
       privilege: parseInt(emp.privilege || emp.role || 0) || 0,
     });
     imported++;
   }
-
   res.json({ success: true, imported, total: result.employees.length });
 });
 
