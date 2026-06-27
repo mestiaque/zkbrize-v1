@@ -3634,3 +3634,8 @@ OPLOG 82	20026	2026-06-27 15:59:50	add adms address	0	0	0
 
 [2026-06-27 19:56:08] INFO: ADMS POST SN=UDP3251601483 table=ATTLOG recordLines=1
 [2026-06-27 19:56:08] INFO: ADMS UDP3251601483 saved 1 attendance records
+[2026-06-27 19:56:12] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-27 19:56:16] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-27 19:56:21] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-27 19:56:26] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
+[2026-06-27 19:56:32] INFO: ADMS RAW GET /iclock/getrequest?SN=UDP3251601483 | headers.sn=- | body: 
