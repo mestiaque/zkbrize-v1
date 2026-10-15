@@ -22,8 +22,9 @@ if not exist "node_modules" (
     )
 )
 
-:: Create logs folder if missing
+:: Create logs and data folders if missing
 if not exist "logs" mkdir logs
+if not exist "data" mkdir data
 
 :: Check if PM2 is available
 where pm2 >nul 2>&1

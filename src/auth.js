@@ -171,5 +171,5 @@ module.exports = {
   verifyLogin,
   createUser, updateUser, deleteUser, listUsers, loadUsers,
   createRole, updateRole, deleteRole, loadRoles,
-  MASTER_USERNAME,
+  MASTER_USERNAME, DEFAULT_ROLES,
 };

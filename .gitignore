@@ -1,9 +1,18 @@
+# Dependencies
 node_modules/
-# .env
-data/users.json
-data/config.json
-data/permissions.json
+
+# Local configuration (created from .env.example on first run)
+.env
+
+# Runtime data — created automatically by the app
+data/*
+!data/.gitkeep
+
+# Logs — created automatically by the app
 logs/
 *.log
 npm-debug.log*
+
+# OS / editor
 .DS_Store
+Thumbs.db

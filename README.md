@@ -21,8 +21,9 @@ npm install
 
 ### 2. Configure
 ```bash
-cp config/default.env .env
-# Edit .env with your settings
+# Nothing to do — on first start the app creates .env from .env.example
+# (with a random SESSION_SECRET and MASTER_PASSWORD, printed in the console),
+# plus the data/ and logs/ folders. Edit .env afterwards if needed.
 ```
 
 ### 3. Run
@@ -35,15 +36,19 @@ npm start
 
 ## .env Configuration
 
+All options are listed with comments in [`.env.example`](.env.example). The most common ones:
+
 ```env
-PORT=3000               # Web UI & API port
-ADMS_PORT=7788          # ZKTeco ADMS push port
+PORT=3000                              # Web UI & API port
+ADMS_PORT=5015                         # ZKTeco ADMS push port
+MASTER_USERNAME=superadmin             # Built-in admin login
+MASTER_PASSWORD=change-me
 
 LARAVEL_API_URL=https://yourapp.com/api
 LARAVEL_API_TOKEN=your-sanctum-token
 
-SYNC_SCHEDULE=*/30 * * * *           # Employee sync frequency
-ATTENDANCE_FETCH_SCHEDULE=*/15 * * * * # TCP device pull frequency
+SYNC_SCHEDULE=*/30 * * * *             # Employee sync frequency
+ATTENDANCE_FETCH_SCHEDULE=*/15 * * * * # TCP pull + ERP push frequency
 ```
 
 ---
@@ -171,9 +176,9 @@ zk-bridge/
 │   ├── index.html
 │   ├── css/style.css
 │   └── js/app.js
-├── config/
-│   └── default.env
-├── logs/                  # Auto-created
+├── data/                  # Auto-created (runtime data, git-ignored)
+├── logs/                  # Auto-created (git-ignored)
+├── .env.example           # Template for .env
 └── README.md
 ```
 

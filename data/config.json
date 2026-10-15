@@ -1,6 +1,0 @@
-{
-  "syncSchedule": "*/2 * * * *",
-  "attendanceFetchSchedule": "*/2 * * * *",
-  "employeeSyncEnabled": true,
-  "attendanceSyncEnabled": true
-}

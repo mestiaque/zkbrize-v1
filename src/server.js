@@ -1,19 +1,30 @@
-require('dotenv').config();
+const path = require('path');
+const { prepareEnvironment, ensureDataFiles, ENV_FILE } = require('./bootstrap');
+prepareEnvironment();
+require('dotenv').config({ path: ENV_FILE });
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
 const session = require('express-session');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const path = require('path');
 const logger = require('./logger');
-const { store, loadConfigFile } = require('./store');
+const { store, loadConfigFile, DEFAULT_PERMISSIONS } = require('./store');
 const routes = require('./routes');
 const authRoutes = require('./authRoutes');
-const { requireAuth, requireSuperAdmin } = require('./auth');
+const { requireAuth, requireSuperAdmin, DEFAULT_ROLES } = require('./auth');
 const { startADMSServer, setSocketIO: admsSetIO } = require('./adms/server');
-const { setSocketIO: tcpSetIO } = require('./tcpip/connector');
+const { setSocketIO: tcpSetIO, initTCPDevices } = require('./tcpip/connector');
 const { startScheduler, setSocketIO: schedSetIO } = require('./scheduler');
+
+ensureDataFiles({
+  'config.json': {},
+  'employees.json': {},
+  'permissions.json': DEFAULT_PERMISSIONS,
+  'users.json': [],
+  'roles.json': DEFAULT_ROLES,
+  'tcp_devices.json': [],
+});
 
 // Load config from env
 store.config.laravelApiUrl = process.env.LARAVEL_API_URL || '';
@@ -80,6 +91,7 @@ io.on('connection', (socket) => {
 // ── Start services ─────────────────────────────────────────────────
 startADMSServer(store.config.admsPort);
 logger.info(`ADMS server started on port ${store.config.admsPort}`);
+initTCPDevices();
 startScheduler();
 
 const G = '\x1b[32m', R = '\x1b[0m';

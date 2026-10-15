@@ -402,6 +402,19 @@ router.get('/employees', (req, res) => {
 router.post('/employees/load-from-device', async (req, res) => {
   const admsDevices = Object.values(store.devices).filter(d => d.type === 'adms' && d.status === 'connected');
   if (!admsDevices.length) {
+    const tcpDevice = Object.values(store.devices).find(d => d.type === 'tcp' && d.status === 'connected');
+    if (tcpDevice) {
+      const result = await getEmployeesFromDevice(tcpDevice.id);
+      if (result.success) {
+        for (const e of result.employees) {
+          if (e.uid > 0) upsertEmployee({ uid: e.uid, employee_id: e.employee_id, name: e.name, privilege: e.privilege, password: e.password });
+        }
+        if (result.employees.length) markEmployeesSynced(result.employees.map(e => String(e.uid)));
+        const bridgeEmps = result.employees.map(e => store.employees[String(e.uid)]).filter(Boolean);
+        return res.json({ success: true, employees: bridgeEmps, source: 'device', total: bridgeEmps.length });
+      }
+      logger.warn(`Load from TCP device ${tcpDevice.id} failed: ${result.error}`);
+    }
     const synced = Object.values(store.employees).filter(e => e.syncedToDevice);
     return res.json({ success: true, employees: synced, source: 'bridge', total: synced.length, warning: 'No ADMS device connected — showing bridge-synced employees' });
   }
@@ -490,6 +503,7 @@ router.post('/employees', async (req, res) => {
 // Delete a bridge employee, then try to remove from device
 router.delete('/employees/:uid', async (req, res) => {
   const { uid } = req.params;
+  const removedEmp = store.employees[String(uid)];
   deleteEmployee(uid);
 
   const connectedDevices = Object.values(store.devices).filter(d => d.status === 'connected');
@@ -499,7 +513,7 @@ router.delete('/employees/:uid', async (req, res) => {
   const syncResults = [];
   for (const device of tcpDevices) {
     try {
-      const r = await deleteEmployeeFromDevice(device.id, uid);
+      const r = await deleteEmployeeFromDevice(device.id, uid, removedEmp?.employee_id);
       syncResults.push({ deviceId: device.id, synced: r.success });
     } catch (e) {
       syncResults.push({ deviceId: device.id, synced: false, error: e.message });

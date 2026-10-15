@@ -256,7 +256,7 @@ arp -a
 
 ## Environment Variables (Optional)
 
-Project folder-এ `.env` file তৈরি করুন:
+প্রথমবার চালু করলে app নিজেই `.env.example` থেকে `.env` তৈরি করে (random `SESSION_SECRET` ও `MASTER_PASSWORD` সহ — password console-এ দেখায়)। পরিবর্তন করতে `.env` edit করে restart দিন। সব option-এর ব্যাখ্যা `.env.example`-এ আছে:
 
 ```env
 PORT=3000
